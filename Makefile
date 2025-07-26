@@ -1,13 +1,15 @@
-.PHONY: help build test test-integration run-demo clean fmt vet
+.PHONY: help build build-server test test-integration run-demo run-server clean fmt vet
 
 # Default target
 help:
 	@echo "Available targets:"
 	@echo "  build            - Build the demo application"
+	@echo "  build-server     - Build the HTTP server application"
 	@echo "  test             - Run all tests"
 	@echo "  test-unit        - Run unit tests only"
 	@echo "  test-integration - Run integration tests only"
 	@echo "  run-demo         - Run the demo application"
+	@echo "  run-server       - Run the HTTP server with web UI"
 	@echo "  clean            - Clean build artifacts"
 	@echo "  fmt              - Format Go code"
 	@echo "  vet              - Run go vet"
@@ -17,6 +19,14 @@ help:
 build:
 	@echo "Building demo application..."
 	go build -o bin/demo ./cmd/demo
+
+# Build the HTTP server application
+build-server:
+	@echo "Building HTTP server application..."
+	go build -o bin/server ./cmd/server
+
+# Build all applications
+build-all: build build-server
 
 # Run all tests
 test: fmt vet test-unit test-integration
@@ -35,6 +45,20 @@ test-integration:
 run-demo: build
 	@echo "Running BBS+ Selective Disclosure Demo..."
 	./bin/demo
+
+# Run the HTTP server
+run-server: build-server
+	@echo "Starting BBS+ Selective Disclosure HTTP Server..."
+	@echo "🌐 Web UI will be available at: http://localhost:8080"
+	@echo "📡 API will be available at: http://localhost:8080/api/*"
+	./bin/server
+
+# Run server without building (go run)
+server:
+	@echo "Starting BBS+ Selective Disclosure HTTP Server..."
+	@echo "🌐 Web UI will be available at: http://localhost:8080"
+	@echo "📡 API will be available at: http://localhost:8080/api/*"
+	go run ./cmd/server
 
 # Run demo without building (go run)
 demo:

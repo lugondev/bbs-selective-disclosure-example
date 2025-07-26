@@ -14,7 +14,11 @@ This project demonstrates how selective disclosure works in practice, allowing:
 ```
 /bbs-selective-disclosure-example
 ├── cmd/
-│   └── demo/                    # CLI demo application
+│   ├── demo/                    # CLI demo application
+│   └── server/                  # HTTP server with web UI
+├── interfaces/
+│   └── http/                    # HTTP handlers and DTOs
+├── web/                         # Web UI files
 ├── pkg/
 │   ├── bbs/                     # BBS+ cryptographic operations
 │   ├── did/                     # DID management
@@ -49,7 +53,28 @@ go mod download
 make deps
 ```
 
-### 3. Run demo
+### 3. Run HTTP Server with Web UI
+```bash
+# Method 1: Using Makefile
+make run-server
+
+# Method 2: Direct `go run`
+make server
+
+# Method 3: Build and run
+make build-server
+./bin/server
+
+# Run on custom port
+./bin/server -port 3000
+```
+
+The server will start on `http://localhost:8080` by default and provide:
+- 🌐 **Web UI**: Interactive demo interface at `http://localhost:8080`
+- 📡 **REST API**: HTTP endpoints at `http://localhost:8080/api/*`
+- 🏥 **Health Check**: Status endpoint at `http://localhost:8080/health`
+
+### 4. Run CLI Demo
 ```bash
 # Method 1: Using Makefile
 make run-demo
@@ -62,7 +87,7 @@ make build
 ./bin/demo
 ```
 
-### 4. Run tests
+### 5. Run tests
 ```bash
 # Run all tests
 make test
@@ -73,6 +98,48 @@ make test-integration
 # Test with coverage report
 make test-coverage
 ```
+
+## 🌐 Web UI Features
+
+The web interface provides an interactive demonstration of the BBS+ selective disclosure flow:
+
+### 🎬 **Demo Flow**
+1. **Setup Entities**: Initialize Issuer (Government), Holder (Citizen), and Verifier (Cinema)
+2. **Issue Credential**: Government issues a Digital ID with multiple claims
+3. **Create Presentation**: Citizen creates selective disclosure proof revealing only necessary information
+4. **Verify**: Cinema verifies age and nationality without seeing personal details
+
+### 🚀 **Quick Demo**
+- Click "Run Full Demo" to execute the complete flow automatically
+- Watch the execution logs to understand each step
+- See how privacy is preserved through selective disclosure
+
+### 🔧 **Manual Testing**
+- Use individual sections to test specific scenarios
+- Modify revealed attributes to see different privacy outcomes
+- Test verification with different requirements and trusted issuers
+
+## 📡 API Endpoints
+
+### Issuer API
+- `POST /api/issuer/setup` - Setup issuer with DID
+- `POST /api/issuer/credentials` - Issue verifiable credential
+- `POST /api/issuer/verify` - Verify credential
+
+### Holder API
+- `POST /api/holder/setup` - Setup holder with DID
+- `POST /api/holder/credentials` - Store received credential
+- `GET /api/holder/credentials/list` - List stored credentials
+- `POST /api/holder/presentations` - Create selective disclosure presentation
+
+### Verifier API
+- `POST /api/verifier/setup` - Setup verifier with DID
+- `POST /api/verifier/verify` - Verify presentation
+- `POST /api/verifier/verification-request` - Create verification request
+- `GET /api/verifier/presentations` - List verified presentations
+
+### Utility API
+- `GET /health` - Health check
 
 ## 📝 Demo Scenario
 
@@ -203,6 +270,8 @@ Verifier only sees:
 ## 🛠️ Tech Stack
 
 - **Language**: Go 1.21+
+- **Web UI**: HTML, CSS, JavaScript (Vanilla)
+- **API**: REST with JSON
 - **Cryptography**: Ed25519, BBS+ (simplified implementation)
 - **Testing**: testify/assert, testify/require
 - **Build**: Make, Go modules
@@ -215,20 +284,26 @@ Verifier only sees:
 2. **Key Management**: Implement secure key storage.
 3. **DID Methods**: Use production DID methods (e.g., did:web, did:ion).
 4. **Cryptographic Security**: Audit cryptographic implementations.
+5. **HTTPS**: Use HTTPS in production environments.
+6. **CORS**: Configure CORS properly for production.
 
 ### Simplified Components
 - BBS+ signing and proofs are simplified for demonstration purposes.
 - DID resolution uses in-memory storage.
 - Does not implement the full W3C VC/VP specifications.
+- CORS is enabled for all origins (development only).
 
 ## 📈 Future Enhancements
 
 - [ ] Integration with Hyperledger Aries BBS+
 - [ ] Support for multiple DID methods
 - [ ] Zero-knowledge proof optimizations
-- [ ] Web-based demo interface
+- [x] Web-based demo interface ✅
 - [ ] Performance benchmarks
 - [ ] Production deployment guides
+- [ ] Authentication and authorization
+- [ ] Persistent storage options
+- [ ] Docker containerization
 
 ## 🤝 Contributing
 
