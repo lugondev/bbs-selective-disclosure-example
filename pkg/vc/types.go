@@ -50,6 +50,7 @@ type Claim struct {
 type SelectiveDisclosureRequest struct {
 	CredentialID       string   `json:"credentialId"`
 	RevealedAttributes []string `json:"revealedAttributes"`
+	Nonce              string   `json:"nonce,omitempty"`
 }
 
 // CredentialService interface for credential operations

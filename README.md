@@ -69,10 +69,10 @@ make build-server
 ./bin/server -port 3000
 ```
 
-The server will start on `http://localhost:8080` by default and provide:
-- 🌐 **Web UI**: Interactive demo interface at `http://localhost:8080`
-- 📡 **REST API**: HTTP endpoints at `http://localhost:8080/api/*`
-- 🏥 **Health Check**: Status endpoint at `http://localhost:8080/health`
+The server will start on `http://localhost:8089` by default and provide:
+- 🌐 **Web UI**: Interactive demo interface at `http://localhost:8089`
+- 📡 **REST API**: HTTP endpoints at `http://localhost:8089/api/*`
+- 🏥 **Health Check**: Status endpoint at `http://localhost:8089/health`
 
 ### 4. Run CLI Demo
 ```bash

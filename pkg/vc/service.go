@@ -185,10 +185,17 @@ func (s *ServiceImpl) createSelectiveDisclosureCredential(credential *Verifiable
 		}
 	}
 
-	// Generate nonce for proof
-	nonce := make([]byte, 32)
-	if _, err := rand.Read(nonce); err != nil {
-		return nil, fmt.Errorf("failed to generate nonce: %w", err)
+	// Use provided nonce or generate one if not provided
+	var nonceStr string
+	if request.Nonce != "" {
+		nonceStr = request.Nonce
+	} else {
+		// Generate nonce for proof
+		nonce := make([]byte, 32)
+		if _, err := rand.Read(nonce); err != nil {
+			return nil, fmt.Errorf("failed to generate nonce: %w", err)
+		}
+		nonceStr = fmt.Sprintf("%x", nonce)
 	}
 
 	// Create selective disclosure proof
@@ -200,7 +207,7 @@ func (s *ServiceImpl) createSelectiveDisclosureCredential(credential *Verifiable
 		"verificationMethod": credential.Proof.VerificationMethod,
 		"proofPurpose":       "assertionMethod",
 		"proofValue":         "derived-proof-placeholder",
-		"nonce":              fmt.Sprintf("%x", nonce),
+		"nonce":              nonceStr,
 		"revealedAttributes": request.RevealedAttributes,
 	}
 

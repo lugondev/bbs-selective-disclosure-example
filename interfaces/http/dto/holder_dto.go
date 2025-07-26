@@ -28,12 +28,14 @@ type CreatePresentationRequest struct {
 	HolderDID           string                          `json:"holderDid" validate:"required"`
 	CredentialIDs       []string                        `json:"credentialIds" validate:"required,min=1"`
 	SelectiveDisclosure []SelectiveDisclosureRequestDTO `json:"selectiveDisclosure" validate:"required,min=1"`
+	Nonce               string                          `json:"nonce,omitempty"`
 }
 
 // SelectiveDisclosureRequestDTO represents a selective disclosure request
 type SelectiveDisclosureRequestDTO struct {
 	CredentialID       string   `json:"credentialId" validate:"required"`
 	RevealedAttributes []string `json:"revealedAttributes" validate:"required,min=1"`
+	Nonce              string   `json:"nonce,omitempty"`
 }
 
 // CreatePresentationResponse represents the response from creating a presentation
@@ -54,6 +56,7 @@ func ToVCSelectiveDisclosure(dtos []SelectiveDisclosureRequestDTO) []vc.Selectiv
 		vcReqs[i] = vc.SelectiveDisclosureRequest{
 			CredentialID:       dto.CredentialID,
 			RevealedAttributes: dto.RevealedAttributes,
+			Nonce:              dto.Nonce,
 		}
 	}
 	return vcReqs

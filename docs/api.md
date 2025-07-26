@@ -7,7 +7,7 @@ This API provides endpoints for demonstrating BBS+ selective disclosure with ver
 ## Base URL
 
 ```
-http://localhost:8080
+http://localhost:8089
 ```
 
 ## Authentication
@@ -453,28 +453,28 @@ All endpoints may return error responses in the following format:
 
 1. **Setup Issuer:**
    ```bash
-   curl -X POST http://localhost:8080/api/issuer/setup \
+   curl -X POST http://localhost:8089/api/issuer/setup \
      -H "Content-Type: application/json" \
      -d '{"method": "example"}'
    ```
 
 2. **Setup Holder:**
    ```bash
-   curl -X POST http://localhost:8080/api/holder/setup \
+   curl -X POST http://localhost:8089/api/holder/setup \
      -H "Content-Type: application/json" \
      -d '{"method": "example"}'
    ```
 
 3. **Setup Verifier:**
    ```bash
-   curl -X POST http://localhost:8080/api/verifier/setup \
+   curl -X POST http://localhost:8089/api/verifier/setup \
      -H "Content-Type: application/json" \
      -d '{"method": "example"}'
    ```
 
 4. **Issue Credential:**
    ```bash
-   curl -X POST http://localhost:8080/api/issuer/credentials \
+   curl -X POST http://localhost:8089/api/issuer/credentials \
      -H "Content-Type: application/json" \
      -d '{
        "issuerDid": "did:example:issuer123",
@@ -494,7 +494,7 @@ All endpoints may return error responses in the following format:
 
 6. **Create Presentation:**
    ```bash
-   curl -X POST http://localhost:8080/api/holder/presentations \
+   curl -X POST http://localhost:8089/api/holder/presentations \
      -H "Content-Type: application/json" \
      -d '{
        "holderDid": "did:example:holder456",

@@ -103,6 +103,10 @@ func runDemo(issuerUC *issuer.UseCase, holderUC *holder.UseCase, verifierUC *ver
 	fmt.Println("  - Nationality: needs nationality")
 	fmt.Println("  - Does NOT need: firstName, lastName, address, idNumber")
 
+	// Generate verification nonce
+	verificationNonce := "cinema-verification-" + fmt.Sprintf("%d", time.Now().UnixMilli())
+	fmt.Printf("  Generated verification nonce: %s\n", verificationNonce)
+
 	// Step 7: Holder creates selective disclosure presentation
 	fmt.Println("\n🎪 Step 7: Creating selective disclosure presentation")
 
@@ -117,6 +121,7 @@ func runDemo(issuerUC *issuer.UseCase, holderUC *holder.UseCase, verifierUC *ver
 		HolderDID:           holderSetup.DID.String(),
 		CredentialIDs:       []string{credential.ID},
 		SelectiveDisclosure: selectiveDisclosure,
+		Nonce:               verificationNonce, // Use the verification nonce
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create presentation: %w", err)
@@ -133,7 +138,7 @@ func runDemo(issuerUC *issuer.UseCase, holderUC *holder.UseCase, verifierUC *ver
 		Presentation:      presentation,
 		RequiredClaims:    []string{"dateOfBirth", "nationality"},
 		TrustedIssuers:    []string{issuerSetup.DID.String()},
-		VerificationNonce: "cinema-verification-" + fmt.Sprintf("%d", time.Now().Unix()),
+		VerificationNonce: verificationNonce, // Use the same verification nonce
 	})
 	if err != nil {
 		return fmt.Errorf("failed to verify presentation: %w", err)
@@ -181,7 +186,7 @@ func runDemo(issuerUC *issuer.UseCase, holderUC *holder.UseCase, verifierUC *ver
 
 	// Step 12: Display presentation structure
 	fmt.Println("\n📋 Step 12: Technical Details")
-	if presentation.VerifiableCredential != nil && len(presentation.VerifiableCredential) > 0 {
+	if len(presentation.VerifiableCredential) > 0 {
 		credentialData, _ := json.MarshalIndent(presentation.VerifiableCredential[0], "  ", "  ")
 		fmt.Printf("  Selective disclosure credential structure:\n  %s\n", credentialData)
 	}

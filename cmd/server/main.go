@@ -16,7 +16,7 @@ import (
 
 func main() {
 	// Parse command line flags
-	port := flag.String("port", "8080", "Server port")
+	port := flag.String("port", "8089", "Server port")
 	flag.Parse()
 
 	log.Println("🔐 Initializing BBS+ Selective Disclosure API Server")

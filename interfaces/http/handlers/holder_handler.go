@@ -106,10 +106,20 @@ func (h *HolderHandler) CreatePresentation(w http.ResponseWriter, r *http.Reques
 	}
 
 	// Convert DTO to use case request
+	selectiveDisclosure := dto.ToVCSelectiveDisclosure(req.SelectiveDisclosure)
+
+	// If nonce is provided at the request level, override individual nonces
+	if req.Nonce != "" {
+		for i := range selectiveDisclosure {
+			selectiveDisclosure[i].Nonce = req.Nonce
+		}
+	}
+
 	ucReq := holder.PresentationRequest{
 		HolderDID:           req.HolderDID,
 		CredentialIDs:       req.CredentialIDs,
-		SelectiveDisclosure: dto.ToVCSelectiveDisclosure(req.SelectiveDisclosure),
+		SelectiveDisclosure: selectiveDisclosure,
+		Nonce:               req.Nonce,
 	}
 
 	// Create presentation

@@ -85,6 +85,7 @@ type PresentationRequest struct {
 	HolderDID           string
 	CredentialIDs       []string
 	SelectiveDisclosure []vc.SelectiveDisclosureRequest
+	Nonce               string
 }
 
 // CreatePresentation creates a verifiable presentation with selective disclosure
@@ -117,8 +118,17 @@ func (uc *UseCase) CreatePresentation(req PresentationRequest) (*vc.VerifiablePr
 		credentials = append(credentials, credential)
 	}
 
+	// Set nonce for each selective disclosure request if provided
+	disclosureRequests := make([]vc.SelectiveDisclosureRequest, len(req.SelectiveDisclosure))
+	for i, sd := range req.SelectiveDisclosure {
+		disclosureRequests[i] = sd
+		if req.Nonce != "" {
+			disclosureRequests[i].Nonce = req.Nonce
+		}
+	}
+
 	// Create presentation
-	presentation, err := uc.vcService.CreatePresentation(req.HolderDID, credentials, req.SelectiveDisclosure)
+	presentation, err := uc.vcService.CreatePresentation(req.HolderDID, credentials, disclosureRequests)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create presentation: %w", err)
 	}

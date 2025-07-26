@@ -49,15 +49,15 @@ run-demo: build
 # Run the HTTP server
 run-server: build-server
 	@echo "Starting BBS+ Selective Disclosure HTTP Server..."
-	@echo "🌐 Web UI will be available at: http://localhost:8080"
-	@echo "📡 API will be available at: http://localhost:8080/api/*"
+	@echo "🌐 Web UI will be available at: http://localhost:8089"
+	@echo "📡 API will be available at: http://localhost:8089/api/*"
 	./bin/server
 
 # Run server without building (go run)
 server:
 	@echo "Starting BBS+ Selective Disclosure HTTP Server..."
-	@echo "🌐 Web UI will be available at: http://localhost:8080"
-	@echo "📡 API will be available at: http://localhost:8080/api/*"
+	@echo "🌐 Web UI will be available at: http://localhost:8089"
+	@echo "📡 API will be available at: http://localhost:8089/api/*"
 	go run ./cmd/server
 
 # Run demo without building (go run)

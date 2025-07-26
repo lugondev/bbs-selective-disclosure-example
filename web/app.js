@@ -4,6 +4,7 @@ let holderDID = '';
 let verifierDID = '';
 let issuedCredential = null;
 let currentPresentation = null;
+let verificationNonce = null; // Store the verification nonce for proper flow
 
 // API base URL
 const API_BASE = window.location.origin;
@@ -216,6 +217,10 @@ async function createPresentation() {
         log('Creating selective disclosure presentation...', 'info');
         updateFlowStep(3);
         
+        // Generate verification nonce for this presentation
+        verificationNonce = `cinema-verification-${Date.now()}`;
+        log(`🎲 Generated verification nonce: ${verificationNonce}`, 'info');
+        
         // Get revealed attributes based on checkboxes
         const revealedAttributes = [];
         if (document.getElementById('reveal-dob').checked) revealedAttributes.push('dateOfBirth');
@@ -233,7 +238,8 @@ async function createPresentation() {
                 selectiveDisclosure: [{
                     credentialId: credentialId,
                     revealedAttributes: revealedAttributes
-                }]
+                }],
+                nonce: verificationNonce // Include the nonce in the presentation creation
             })
         });
         
@@ -299,13 +305,17 @@ async function verifyPresentation() {
         const requiredClaims = document.getElementById('required-claims').value.split(',').map(s => s.trim());
         const trustedIssuers = document.getElementById('trusted-issuers').value.split(',').map(s => s.trim()).filter(s => s);
         
+        // Use the same nonce that was used during presentation creation
+        const nonceToUse = verificationNonce || `cinema-verification-${Date.now()}`;
+        log(`🔍 Using verification nonce: ${nonceToUse}`, 'info');
+        
         const response = await apiCall('/api/verifier/verify', {
             method: 'POST',
             body: JSON.stringify({
                 presentation: presentation,
                 requiredClaims: requiredClaims,
                 trustedIssuers: trustedIssuers,
-                verificationNonce: `cinema-verification-${Date.now()}`
+                verificationNonce: nonceToUse
             })
         });
         
