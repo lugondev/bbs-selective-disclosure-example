@@ -1,0 +1,1529 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>demo: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/lugon/bbs-selective-disclosure-example/cmd/demo/main.go (0.0%)</option>
+				
+				<option value="file1">github.com/lugon/bbs-selective-disclosure-example/internal/holder/usecase.go (61.0%)</option>
+				
+				<option value="file2">github.com/lugon/bbs-selective-disclosure-example/internal/issuer/usecase.go (65.2%)</option>
+				
+				<option value="file3">github.com/lugon/bbs-selective-disclosure-example/internal/verifier/usecase.go (59.7%)</option>
+				
+				<option value="file4">github.com/lugon/bbs-selective-disclosure-example/pkg/bbs/service.go (94.5%)</option>
+				
+				<option value="file5">github.com/lugon/bbs-selective-disclosure-example/pkg/did/service.go (90.9%)</option>
+				
+				<option value="file6">github.com/lugon/bbs-selective-disclosure-example/pkg/did/types.go (100.0%)</option>
+				
+				<option value="file7">github.com/lugon/bbs-selective-disclosure-example/pkg/vc/service.go (75.6%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "encoding/json"
+        "fmt"
+        "log"
+        "time"
+
+        "github.com/lugon/bbs-selective-disclosure-example/internal/holder"
+        "github.com/lugon/bbs-selective-disclosure-example/internal/issuer"
+        "github.com/lugon/bbs-selective-disclosure-example/internal/verifier"
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/did"
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+)
+
+func main() <span class="cov0" title="0">{
+        fmt.Println("🔐 BBS+ Selective Disclosure Demo")
+        fmt.Println("=====================================")
+
+        // Initialize services
+        didRepo := did.NewInMemoryRepository()
+        didService := did.NewService(didRepo)
+        bbsService := bbs.NewService()
+        credRepo := vc.NewInMemoryCredentialRepository()
+        presRepo := vc.NewInMemoryPresentationRepository()
+        vcService := vc.NewService(bbsService, credRepo, presRepo)
+
+        // Initialize use cases
+        issuerUC := issuer.NewUseCase(didService, vcService, bbsService)
+        holderUC := holder.NewUseCase(didService, vcService, credRepo)
+        verifierUC := verifier.NewUseCase(didService, vcService, presRepo)
+
+        // Demo scenario
+        if err := runDemo(issuerUC, holderUC, verifierUC); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Demo failed: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">fmt.Println("\n✅ Demo completed successfully!")</span>
+}
+
+func runDemo(issuerUC *issuer.UseCase, holderUC *holder.UseCase, verifierUC *verifier.UseCase) error <span class="cov0" title="0">{
+        // Step 1: Setup Issuer (Government ID Authority)
+        fmt.Println("\n📋 Step 1: Setting up Issuer (Government ID Authority)")
+        issuerSetup, err := issuerUC.SetupIssuer("example")
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to setup issuer: %w", err)
+        }</span>
+        <span class="cov0" title="0">fmt.Printf("✓ Issuer DID: %s\n", issuerSetup.DID.String())
+
+        // Step 2: Setup Holder (Citizen)
+        fmt.Println("\n👤 Step 2: Setting up Holder (Citizen)")
+        holderSetup, err := holderUC.SetupHolder("example")
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to setup holder: %w", err)
+        }</span>
+        <span class="cov0" title="0">fmt.Printf("✓ Holder DID: %s\n", holderSetup.DID.String())
+
+        // Step 3: Setup Verifier (Cinema)
+        fmt.Println("\n🎬 Step 3: Setting up Verifier (Cinema)")
+        verifierSetup, err := verifierUC.SetupVerifier("example")
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to setup verifier: %w", err)
+        }</span>
+        <span class="cov0" title="0">fmt.Printf("✓ Verifier DID: %s\n", verifierSetup.DID.String())
+
+        // Step 4: Issue Digital ID Credential
+        fmt.Println("\n📄 Step 4: Issuing Digital ID Credential")
+
+        // Create claims for a digital ID
+        claims := []vc.Claim{
+                {Key: "firstName", Value: "An"},
+                {Key: "lastName", Value: "Nguyen Van"},
+                {Key: "dateOfBirth", Value: "2000-01-20"},
+                {Key: "nationality", Value: "Vietnamese"},
+                {Key: "address", Value: "123 Nguyen Trai St, Ho Chi Minh City"},
+                {Key: "idNumber", Value: "123456789"},
+        }
+
+        credential, err := issuerUC.IssueCredential(issuer.IssueCredentialRequest{
+                IssuerDID:  issuerSetup.DID.String(),
+                SubjectDID: holderSetup.DID.String(),
+                Claims:     claims,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to issue credential: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">fmt.Printf("✓ Credential issued with ID: %s\n", credential.ID)
+        fmt.Printf("  Claims: %v\n", getClaimKeys(claims))
+
+        // Step 5: Holder stores the credential
+        fmt.Println("\n💾 Step 5: Holder storing credential")
+        if err := holderUC.StoreCredential(credential); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to store credential: %w", err)
+        }</span>
+        <span class="cov0" title="0">fmt.Println("✓ Credential stored successfully")
+
+        // Step 6: Cinema requests age and nationality verification
+        fmt.Println("\n🎭 Step 6: Cinema requests age and nationality verification")
+        fmt.Println("  Cinema needs to verify:")
+        fmt.Println("  - Age (18+): needs dateOfBirth")
+        fmt.Println("  - Nationality: needs nationality")
+        fmt.Println("  - Does NOT need: firstName, lastName, address, idNumber")
+
+        // Step 7: Holder creates selective disclosure presentation
+        fmt.Println("\n🎪 Step 7: Creating selective disclosure presentation")
+
+        selectiveDisclosure := []vc.SelectiveDisclosureRequest{
+                {
+                        CredentialID:       credential.ID,
+                        RevealedAttributes: []string{"dateOfBirth", "nationality"}, // Only reveal these
+                },
+        }
+
+        presentation, err := holderUC.CreatePresentation(holder.PresentationRequest{
+                HolderDID:           holderSetup.DID.String(),
+                CredentialIDs:       []string{credential.ID},
+                SelectiveDisclosure: selectiveDisclosure,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to create presentation: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">fmt.Printf("✓ Presentation created with ID: %s\n", presentation.ID)
+        fmt.Println("  Revealed attributes: dateOfBirth, nationality")
+        fmt.Println("  Hidden attributes: firstName, lastName, address, idNumber")
+
+        // Step 8: Verifier verifies the presentation
+        fmt.Println("\n🔍 Step 8: Cinema verifying presentation")
+
+        verificationResult, err := verifierUC.VerifyPresentation(verifier.VerificationRequest{
+                Presentation:      presentation,
+                RequiredClaims:    []string{"dateOfBirth", "nationality"},
+                TrustedIssuers:    []string{issuerSetup.DID.String()},
+                VerificationNonce: "cinema-verification-" + fmt.Sprintf("%d", time.Now().Unix()),
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to verify presentation: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">fmt.Printf("✓ Verification result: %v\n", verificationResult.Valid)
+        if len(verificationResult.Errors) &gt; 0 </span><span class="cov0" title="0">{
+                fmt.Printf("  Errors: %v\n", verificationResult.Errors)
+        }</span>
+
+        // Step 9: Display revealed information
+        <span class="cov0" title="0">fmt.Println("\n📊 Step 9: Information available to Cinema")
+        fmt.Printf("  Holder DID: %s\n", verificationResult.HolderDID)
+        fmt.Printf("  Issuer DIDs: %v\n", verificationResult.IssuerDIDs)
+        fmt.Printf("  Revealed claims:\n")
+        for key, value := range verificationResult.RevealedClaims </span><span class="cov0" title="0">{
+                fmt.Printf("    %s: %v\n", key, value)
+        }</span>
+
+        // Step 10: Age verification logic
+        <span class="cov0" title="0">fmt.Println("\n🎂 Step 10: Age verification")
+        if dateOfBirth, ok := verificationResult.RevealedClaims["dateOfBirth"].(string); ok </span><span class="cov0" title="0">{
+                age := calculateAge(dateOfBirth)
+                fmt.Printf("  Calculated age: %d years\n", age)
+                if age &gt;= 18 </span><span class="cov0" title="0">{
+                        fmt.Println("  ✅ Age verification: PASSED (18+)")
+                }</span> else<span class="cov0" title="0"> {
+                        fmt.Println("  ❌ Age verification: FAILED (under 18)")
+                }</span>
+        }
+
+        <span class="cov0" title="0">if nationality, ok := verificationResult.RevealedClaims["nationality"].(string); ok </span><span class="cov0" title="0">{
+                fmt.Printf("  Nationality: %s\n", nationality)
+                fmt.Println("  ✅ Nationality verification: PASSED")
+        }</span>
+
+        // Step 11: Privacy demonstration
+        <span class="cov0" title="0">fmt.Println("\n🔒 Step 11: Privacy Protection Demonstration")
+        fmt.Println("  Cinema CANNOT see:")
+        fmt.Println("    - firstName: [HIDDEN]")
+        fmt.Println("    - lastName: [HIDDEN]")
+        fmt.Println("    - address: [HIDDEN]")
+        fmt.Println("    - idNumber: [HIDDEN]")
+        fmt.Println("  But can still verify that these attributes exist and are signed by a trusted issuer!")
+
+        // Step 12: Display presentation structure
+        fmt.Println("\n📋 Step 12: Technical Details")
+        if presentation.VerifiableCredential != nil &amp;&amp; len(presentation.VerifiableCredential) &gt; 0 </span><span class="cov0" title="0">{
+                credentialData, _ := json.MarshalIndent(presentation.VerifiableCredential[0], "  ", "  ")
+                fmt.Printf("  Selective disclosure credential structure:\n  %s\n", credentialData)
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func getClaimKeys(claims []vc.Claim) []string <span class="cov0" title="0">{
+        keys := make([]string, len(claims))
+        for i, claim := range claims </span><span class="cov0" title="0">{
+                keys[i] = claim.Key
+        }</span>
+        <span class="cov0" title="0">return keys</span>
+}
+
+func calculateAge(dateOfBirth string) int <span class="cov0" title="0">{
+        // Parse date of birth (format: YYYY-MM-DD)
+        birthTime, err := time.Parse("2006-01-02", dateOfBirth)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0
+        }</span>
+
+        <span class="cov0" title="0">now := time.Now()
+        age := now.Year() - birthTime.Year()
+
+        // Adjust if birthday hasn't occurred this year
+        if now.YearDay() &lt; birthTime.YearDay() </span><span class="cov0" title="0">{
+                age--
+        }</span>
+
+        <span class="cov0" title="0">return age</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package holder
+
+import (
+        "fmt"
+
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/did"
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+)
+
+// UseCase represents the holder use case
+type UseCase struct {
+        didService did.DIDService
+        vcService  vc.CredentialService
+        credRepo   vc.CredentialRepository
+}
+
+// NewUseCase creates a new holder use case
+func NewUseCase(didService did.DIDService, vcService vc.CredentialService, credRepo vc.CredentialRepository) *UseCase <span class="cov8" title="1">{
+        return &amp;UseCase{
+                didService: didService,
+                vcService:  vcService,
+                credRepo:   credRepo,
+        }
+}</span>
+
+// HolderSetup represents the setup process for a holder
+type HolderSetup struct {
+        DID     *did.DID
+        DIDDoc  *did.DIDDocument
+        KeyPair *did.KeyPair
+}
+
+// SetupHolder sets up a new holder with DID
+func (uc *UseCase) SetupHolder(method string) (*HolderSetup, error) <span class="cov8" title="1">{
+        // Generate DID and key pair
+        holderDID, keyPair, err := uc.didService.GenerateDID(method)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to generate DID: %w", err)
+        }</span>
+
+        // Create DID document
+        <span class="cov8" title="1">didDoc, err := uc.didService.CreateDIDDocument(holderDID, keyPair)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to create DID document: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return &amp;HolderSetup{
+                DID:     holderDID,
+                DIDDoc:  didDoc,
+                KeyPair: keyPair,
+        }, nil</span>
+}
+
+// StoreCredential stores a received credential
+func (uc *UseCase) StoreCredential(credential *vc.VerifiableCredential) error <span class="cov8" title="1">{
+        if credential == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("credential is nil")
+        }</span>
+
+        // Verify credential before storing
+        <span class="cov8" title="1">if err := uc.vcService.VerifyCredential(credential); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("credential verification failed: %w", err)
+        }</span>
+
+        // Store credential
+        <span class="cov8" title="1">if err := uc.credRepo.Store(credential); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to store credential: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// ListCredentials lists all credentials for a holder
+func (uc *UseCase) ListCredentials(holderDID string) ([]*vc.VerifiableCredential, error) <span class="cov8" title="1">{
+        credentials, err := uc.credRepo.List(holderDID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to list credentials: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return credentials, nil</span>
+}
+
+// PresentationRequest represents a presentation request
+type PresentationRequest struct {
+        HolderDID           string
+        CredentialIDs       []string
+        SelectiveDisclosure []vc.SelectiveDisclosureRequest
+}
+
+// CreatePresentation creates a verifiable presentation with selective disclosure
+func (uc *UseCase) CreatePresentation(req PresentationRequest) (*vc.VerifiablePresentation, error) <span class="cov8" title="1">{
+        if req.HolderDID == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("holder DID is required")
+        }</span>
+
+        <span class="cov8" title="1">if len(req.CredentialIDs) == 0 </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("at least one credential ID is required")
+        }</span>
+
+        <span class="cov8" title="1">if len(req.CredentialIDs) != len(req.SelectiveDisclosure) </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("mismatch between credential IDs and selective disclosure requests")
+        }</span>
+
+        // Retrieve credentials
+        <span class="cov8" title="1">var credentials []*vc.VerifiableCredential
+        for _, credID := range req.CredentialIDs </span><span class="cov8" title="1">{
+                credential, err := uc.credRepo.Retrieve(credID)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to retrieve credential %s: %w", credID, err)
+                }</span>
+
+                // Verify holder owns the credential
+                <span class="cov8" title="1">if subjectID, ok := credential.CredentialSubject["id"].(string); !ok || subjectID != req.HolderDID </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("credential %s does not belong to holder %s", credID, req.HolderDID)
+                }</span>
+
+                <span class="cov8" title="1">credentials = append(credentials, credential)</span>
+        }
+
+        // Create presentation
+        <span class="cov8" title="1">presentation, err := uc.vcService.CreatePresentation(req.HolderDID, credentials, req.SelectiveDisclosure)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to create presentation: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return presentation, nil</span>
+}
+
+// GetCredential retrieves a specific credential
+func (uc *UseCase) GetCredential(credentialID string) (*vc.VerifiableCredential, error) <span class="cov0" title="0">{
+        credential, err := uc.credRepo.Retrieve(credentialID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to retrieve credential: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return credential, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package issuer
+
+import (
+        "fmt"
+
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/did"
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+)
+
+// UseCase represents the issuer use case
+type UseCase struct {
+        didService did.DIDService
+        vcService  vc.CredentialService
+        bbsService bbs.BBSService
+}
+
+// NewUseCase creates a new issuer use case
+func NewUseCase(didService did.DIDService, vcService vc.CredentialService, bbsService bbs.BBSService) *UseCase <span class="cov8" title="1">{
+        return &amp;UseCase{
+                didService: didService,
+                vcService:  vcService,
+                bbsService: bbsService,
+        }
+}</span>
+
+// IssuerSetup represents the setup process for an issuer
+type IssuerSetup struct {
+        DID        *did.DID
+        DIDDoc     *did.DIDDocument
+        KeyPair    *did.KeyPair
+        BBSKeyPair *bbs.KeyPair
+}
+
+// SetupIssuer sets up a new issuer with DID and keys
+func (uc *UseCase) SetupIssuer(method string) (*IssuerSetup, error) <span class="cov8" title="1">{
+        // Generate DID and key pair
+        issuerDID, keyPair, err := uc.didService.GenerateDID(method)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to generate DID: %w", err)
+        }</span>
+
+        // Create DID document
+        <span class="cov8" title="1">didDoc, err := uc.didService.CreateDIDDocument(issuerDID, keyPair)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to create DID document: %w", err)
+        }</span>
+
+        // Generate BBS+ key pair for signing credentials
+        <span class="cov8" title="1">bbsKeyPair, err := uc.bbsService.GenerateKeyPair()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to generate BBS+ key pair: %w", err)
+        }</span>
+
+        // Set up the issuer in the VC service
+        <span class="cov8" title="1">uc.vcService.SetIssuerKeyPair(issuerDID.String(), bbsKeyPair)
+
+        return &amp;IssuerSetup{
+                DID:        issuerDID,
+                DIDDoc:     didDoc,
+                KeyPair:    keyPair,
+                BBSKeyPair: bbsKeyPair,
+        }, nil</span>
+}
+
+// IssueCredentialRequest represents a credential issuance request
+type IssueCredentialRequest struct {
+        IssuerDID  string
+        SubjectDID string
+        Claims     []vc.Claim
+}
+
+// IssueCredential issues a new verifiable credential
+func (uc *UseCase) IssueCredential(req IssueCredentialRequest) (*vc.VerifiableCredential, error) <span class="cov8" title="1">{
+        if req.IssuerDID == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("issuer DID is required")
+        }</span>
+
+        <span class="cov8" title="1">if req.SubjectDID == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("subject DID is required")
+        }</span>
+
+        <span class="cov8" title="1">if len(req.Claims) == 0 </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("at least one claim is required")
+        }</span>
+
+        // Issue the credential
+        <span class="cov8" title="1">credential, err := uc.vcService.IssueCredential(req.IssuerDID, req.SubjectDID, req.Claims)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to issue credential: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return credential, nil</span>
+}
+
+// VerifyCredential verifies a verifiable credential
+func (uc *UseCase) VerifyCredential(credential *vc.VerifiableCredential) error <span class="cov0" title="0">{
+        return uc.vcService.VerifyCredential(credential)
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package verifier
+
+import (
+        "fmt"
+
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/did"
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+)
+
+// UseCase represents the verifier use case
+type UseCase struct {
+        didService did.DIDService
+        vcService  vc.CredentialService
+        presRepo   vc.PresentationRepository
+}
+
+// NewUseCase creates a new verifier use case
+func NewUseCase(didService did.DIDService, vcService vc.CredentialService, presRepo vc.PresentationRepository) *UseCase <span class="cov8" title="1">{
+        return &amp;UseCase{
+                didService: didService,
+                vcService:  vcService,
+                presRepo:   presRepo,
+        }
+}</span>
+
+// VerifierSetup represents the setup process for a verifier
+type VerifierSetup struct {
+        DID     *did.DID
+        DIDDoc  *did.DIDDocument
+        KeyPair *did.KeyPair
+}
+
+// SetupVerifier sets up a new verifier with DID
+func (uc *UseCase) SetupVerifier(method string) (*VerifierSetup, error) <span class="cov8" title="1">{
+        // Generate DID and key pair
+        verifierDID, keyPair, err := uc.didService.GenerateDID(method)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to generate DID: %w", err)
+        }</span>
+
+        // Create DID document
+        <span class="cov8" title="1">didDoc, err := uc.didService.CreateDIDDocument(verifierDID, keyPair)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to create DID document: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return &amp;VerifierSetup{
+                DID:     verifierDID,
+                DIDDoc:  didDoc,
+                KeyPair: keyPair,
+        }, nil</span>
+}
+
+// VerificationRequest represents a verification request
+type VerificationRequest struct {
+        Presentation      *vc.VerifiablePresentation
+        RequiredClaims    []string
+        TrustedIssuers    []string
+        VerificationNonce string
+}
+
+// VerificationResult represents the result of verification
+type VerificationResult struct {
+        Valid           bool                   `json:"valid"`
+        Errors          []string               `json:"errors,omitempty"`
+        RevealedClaims  map[string]interface{} `json:"revealedClaims,omitempty"`
+        HolderDID       string                 `json:"holderDid"`
+        IssuerDIDs      []string               `json:"issuerDids"`
+        CredentialTypes []string               `json:"credentialTypes"`
+}
+
+// VerifyPresentation verifies a verifiable presentation
+func (uc *UseCase) VerifyPresentation(req VerificationRequest) (*VerificationResult, error) <span class="cov8" title="1">{
+        result := &amp;VerificationResult{
+                Valid:           true,
+                Errors:          []string{},
+                RevealedClaims:  make(map[string]interface{}),
+                HolderDID:       req.Presentation.Holder,
+                IssuerDIDs:      []string{},
+                CredentialTypes: []string{},
+        }
+
+        // Verify presentation structure
+        if err := uc.vcService.VerifyPresentation(req.Presentation); err != nil </span><span class="cov0" title="0">{
+                result.Valid = false
+                result.Errors = append(result.Errors, fmt.Sprintf("presentation verification failed: %v", err))
+                return result, nil
+        }</span>
+
+        // Verify each credential in the presentation
+        <span class="cov8" title="1">for i, credInterface := range req.Presentation.VerifiableCredential </span><span class="cov8" title="1">{
+                credMap, ok := credInterface.(map[string]interface{})
+                if !ok </span><span class="cov0" title="0">{
+                        result.Valid = false
+                        result.Errors = append(result.Errors, fmt.Sprintf("credential %d: invalid format", i))
+                        continue</span>
+                }
+
+                // Extract issuer
+                <span class="cov8" title="1">issuer, ok := credMap["issuer"].(string)
+                if !ok </span><span class="cov0" title="0">{
+                        result.Valid = false
+                        result.Errors = append(result.Errors, fmt.Sprintf("credential %d: missing or invalid issuer", i))
+                        continue</span>
+                }
+
+                <span class="cov8" title="1">result.IssuerDIDs = append(result.IssuerDIDs, issuer)
+
+                // Check if issuer is trusted
+                if len(req.TrustedIssuers) &gt; 0 </span><span class="cov8" title="1">{
+                        trusted := false
+                        for _, trustedIssuer := range req.TrustedIssuers </span><span class="cov8" title="1">{
+                                if issuer == trustedIssuer </span><span class="cov8" title="1">{
+                                        trusted = true
+                                        break</span>
+                                }
+                        }
+                        <span class="cov8" title="1">if !trusted </span><span class="cov8" title="1">{
+                                result.Valid = false
+                                result.Errors = append(result.Errors, fmt.Sprintf("credential %d: issuer %s is not trusted", i, issuer))
+                                continue</span>
+                        }
+                }
+
+                // Extract credential types
+                <span class="cov8" title="1">if types, ok := credMap["type"].([]interface{}); ok </span><span class="cov0" title="0">{
+                        for _, t := range types </span><span class="cov0" title="0">{
+                                if typeStr, ok := t.(string); ok </span><span class="cov0" title="0">{
+                                        result.CredentialTypes = append(result.CredentialTypes, typeStr)
+                                }</span>
+                        }
+                }
+
+                // Extract revealed claims from credential subject
+                <span class="cov8" title="1">if credentialSubject, ok := credMap["credentialSubject"].(map[string]interface{}); ok </span><span class="cov8" title="1">{
+                        for key, value := range credentialSubject </span><span class="cov8" title="1">{
+                                if key != "id" </span><span class="cov8" title="1">{ // Skip subject ID
+                                        result.RevealedClaims[key] = value
+                                }</span>
+                        }
+                }
+
+                // Verify selective disclosure proof
+                <span class="cov8" title="1">if err := uc.verifySelectiveDisclosureProof(credMap, req.VerificationNonce); err != nil </span><span class="cov0" title="0">{
+                        result.Valid = false
+                        result.Errors = append(result.Errors, fmt.Sprintf("credential %d: selective disclosure verification failed: %v", i, err))
+                }</span>
+        }
+
+        // Check if all required claims are present
+        <span class="cov8" title="1">for _, requiredClaim := range req.RequiredClaims </span><span class="cov8" title="1">{
+                if _, exists := result.RevealedClaims[requiredClaim]; !exists </span><span class="cov8" title="1">{
+                        result.Valid = false
+                        result.Errors = append(result.Errors, fmt.Sprintf("required claim '%s' is missing", requiredClaim))
+                }</span>
+        }
+
+        // Store verification result
+        <span class="cov8" title="1">if result.Valid </span><span class="cov8" title="1">{
+                if err := uc.presRepo.Store(req.Presentation); err != nil </span><span class="cov0" title="0">{
+                        // Log error but don't fail verification
+                        result.Errors = append(result.Errors, fmt.Sprintf("failed to store presentation: %v", err))
+                }</span>
+        }
+
+        <span class="cov8" title="1">return result, nil</span>
+}
+
+// verifySelectiveDisclosureProof verifies the selective disclosure proof
+func (uc *UseCase) verifySelectiveDisclosureProof(credMap map[string]interface{}, nonce string) error <span class="cov8" title="1">{
+        proof, ok := credMap["proof"].(map[string]interface{})
+        if !ok </span><span class="cov0" title="0">{
+                return fmt.Errorf("missing or invalid proof")
+        }</span>
+
+        <span class="cov8" title="1">proofType, ok := proof["type"].(string)
+        if !ok || proofType != "BbsBlsSignatureProof2020" </span><span class="cov0" title="0">{
+                return fmt.Errorf("invalid proof type: expected BbsBlsSignatureProof2020, got %v", proofType)
+        }</span>
+
+        // Verify nonce if provided
+        <span class="cov8" title="1">if nonce != "" </span><span class="cov0" title="0">{
+                proofNonce, ok := proof["nonce"].(string)
+                if !ok || proofNonce != nonce </span><span class="cov0" title="0">{
+                        return fmt.Errorf("nonce mismatch: expected %s, got %v", nonce, proofNonce)
+                }</span>
+        }
+
+        // In a real implementation, you would:
+        // 1. Resolve the issuer DID to get the public key
+        // 2. Verify the BBS+ proof using the public key
+        // 3. Ensure only the claimed attributes are revealed
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// CreateVerificationRequest creates a verification request for specific claims
+type CreateVerificationRequestParams struct {
+        RequiredClaims    []string
+        TrustedIssuers    []string
+        VerificationNonce string
+}
+
+// CreateVerificationRequest creates a verification request
+func (uc *UseCase) CreateVerificationRequest(params CreateVerificationRequestParams) (*CreateVerificationRequestParams, error) <span class="cov0" title="0">{
+        // Generate a nonce if not provided
+        if params.VerificationNonce == "" </span><span class="cov0" title="0">{
+                // In a real implementation, generate a cryptographically secure nonce
+                params.VerificationNonce = "verification-nonce-" + fmt.Sprintf("%d", len(params.RequiredClaims))
+        }</span>
+
+        <span class="cov0" title="0">return &amp;params, nil</span>
+}
+
+// ListVerifiedPresentations lists all verified presentations
+func (uc *UseCase) ListVerifiedPresentations(verifierDID string) ([]*vc.VerifiablePresentation, error) <span class="cov0" title="0">{
+        // In this simplified implementation, we'll return all presentations
+        // In a real implementation, you might filter by verifier
+        presentations, err := uc.presRepo.List("")
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to list presentations: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return presentations, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package bbs
+
+import (
+        "crypto/rand"
+        "crypto/sha256"
+        "encoding/base64"
+        "fmt"
+)
+
+// KeyPair represents a BBS+ key pair
+type KeyPair struct {
+        PublicKey  []byte `json:"publicKey"`
+        PrivateKey []byte `json:"privateKey"`
+}
+
+// Signature represents a BBS+ signature
+type Signature struct {
+        Value []byte `json:"value"`
+}
+
+// Proof represents a BBS+ proof for selective disclosure
+type Proof struct {
+        ProofValue         []byte `json:"proofValue"`
+        RevealedAttributes []int  `json:"revealedAttributes"`
+        Nonce              []byte `json:"nonce"`
+}
+
+// BBSService interface for BBS+ operations
+type BBSService interface {
+        GenerateKeyPair() (*KeyPair, error)
+        Sign(privateKey []byte, messages [][]byte) (*Signature, error)
+        Verify(publicKey []byte, signature *Signature, messages [][]byte) error
+        CreateProof(signature *Signature, publicKey []byte, messages [][]byte, revealedIndices []int, nonce []byte) (*Proof, error)
+        VerifyProof(publicKey []byte, proof *Proof, revealedMessages [][]byte, nonce []byte) error
+}
+
+// SimpleService implements BBSService interface
+// Note: This is a simplified implementation for demonstration purposes
+// In production, use a proper BBS+ library like Hyperledger Aries
+type SimpleService struct{}
+
+// NewService creates a new BBS service
+func NewService() BBSService <span class="cov8" title="1">{
+        return &amp;SimpleService{}
+}</span>
+
+// GenerateKeyPair generates a new BBS+ key pair
+func (s *SimpleService) GenerateKeyPair() (*KeyPair, error) <span class="cov8" title="1">{
+        // Simplified key generation - in reality, use proper BBS+ key generation
+        privateKey := make([]byte, 32)
+        if _, err := rand.Read(privateKey); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to generate private key: %w", err)
+        }</span>
+
+        // Simplified public key derivation
+        <span class="cov8" title="1">hash := sha256.Sum256(privateKey)
+        publicKey := hash[:]
+
+        return &amp;KeyPair{
+                PublicKey:  publicKey,
+                PrivateKey: privateKey,
+        }, nil</span>
+}
+
+// Sign creates a BBS+ signature over multiple messages
+func (s *SimpleService) Sign(privateKey []byte, messages [][]byte) (*Signature, error) <span class="cov8" title="1">{
+        if len(privateKey) != 32 </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("invalid private key length")
+        }</span>
+
+        // Simplified signing - combine all messages and sign with private key
+        <span class="cov8" title="1">var combined []byte
+        for _, msg := range messages </span><span class="cov8" title="1">{
+                combined = append(combined, msg...)
+        }</span>
+
+        // Simple signature = hash(privateKey + messages)
+        <span class="cov8" title="1">hash := sha256.New()
+        hash.Write(privateKey)
+        hash.Write(combined)
+        signature := hash.Sum(nil)
+
+        return &amp;Signature{
+                Value: signature,
+        }, nil</span>
+}
+
+// Verify verifies a BBS+ signature
+func (s *SimpleService) Verify(publicKey []byte, signature *Signature, messages [][]byte) error <span class="cov8" title="1">{
+        if len(publicKey) != 32 </span><span class="cov8" title="1">{
+                return fmt.Errorf("invalid public key length")
+        }</span>
+
+        // Derive private key from public key for verification (simplified)
+        // In real BBS+, this would use pairing operations
+        <span class="cov8" title="1">var combined []byte
+        for _, msg := range messages </span><span class="cov8" title="1">{
+                combined = append(combined, msg...)
+        }</span>
+
+        // For this simplified implementation, we can't actually verify without the private key
+        // In real BBS+, this would use bilinear pairings
+        <span class="cov8" title="1">if len(signature.Value) != 32 </span><span class="cov0" title="0">{
+                return fmt.Errorf("invalid signature format")
+        }</span>
+
+        <span class="cov8" title="1">return nil</span> // Simplified verification
+}
+
+// CreateProof creates a selective disclosure proof
+func (s *SimpleService) CreateProof(signature *Signature, publicKey []byte, messages [][]byte, revealedIndices []int, nonce []byte) (*Proof, error) <span class="cov8" title="1">{
+        if len(nonce) == 0 </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("nonce is required")
+        }</span>
+
+        // Simplified proof creation
+        <span class="cov8" title="1">var proofData []byte
+        proofData = append(proofData, signature.Value...)
+        proofData = append(proofData, nonce...)
+
+        // Add revealed messages to proof
+        for _, idx := range revealedIndices </span><span class="cov8" title="1">{
+                if idx &gt;= len(messages) </span><span class="cov8" title="1">{
+                        return nil, fmt.Errorf("revealed index %d out of range", idx)
+                }</span>
+                <span class="cov8" title="1">proofData = append(proofData, messages[idx]...)</span>
+        }
+
+        <span class="cov8" title="1">hash := sha256.Sum256(proofData)
+
+        return &amp;Proof{
+                ProofValue:         hash[:],
+                RevealedAttributes: revealedIndices,
+                Nonce:              nonce,
+        }, nil</span>
+}
+
+// VerifyProof verifies a selective disclosure proof
+func (s *SimpleService) VerifyProof(publicKey []byte, proof *Proof, revealedMessages [][]byte, nonce []byte) error <span class="cov8" title="1">{
+        if len(publicKey) != 32 </span><span class="cov8" title="1">{
+                return fmt.Errorf("invalid public key length")
+        }</span>
+
+        <span class="cov8" title="1">if len(proof.ProofValue) != 32 </span><span class="cov0" title="0">{
+                return fmt.Errorf("invalid proof format")
+        }</span>
+
+        <span class="cov8" title="1">if len(revealedMessages) != len(proof.RevealedAttributes) </span><span class="cov8" title="1">{
+                return fmt.Errorf("mismatch between revealed messages and indices")
+        }</span>
+
+        // Simplified verification
+        <span class="cov8" title="1">return nil</span>
+}
+
+// EncodeProof encodes a proof to base64 string
+func EncodeProof(proof *Proof) string <span class="cov8" title="1">{
+        // Combine proof value and nonce for encoding
+        data := make([]byte, 0, len(proof.ProofValue)+len(proof.Nonce))
+        data = append(data, proof.ProofValue...)
+        data = append(data, proof.Nonce...)
+        return base64.StdEncoding.EncodeToString(data)
+}</span>
+
+// DecodeProof decodes a proof from base64 string
+func DecodeProof(encoded string, revealedAttributes []int) (*Proof, error) <span class="cov8" title="1">{
+        data, err := base64.StdEncoding.DecodeString(encoded)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("failed to decode proof: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">if len(data) &lt; 32 </span><span class="cov8" title="1">{ // At least 32 bytes for proof value
+                return nil, fmt.Errorf("invalid proof data length")
+        }</span>
+
+        // Split data into proof value (first 32 bytes) and nonce (rest)
+        <span class="cov8" title="1">proofValue := data[:32]
+        nonce := data[32:]
+
+        return &amp;Proof{
+                ProofValue:         proofValue,
+                RevealedAttributes: revealedAttributes,
+                Nonce:              nonce,
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package did
+
+import (
+        "crypto/ed25519"
+        "crypto/rand"
+        "fmt"
+        "time"
+
+        "github.com/btcsuite/btcutil/base58"
+)
+
+// ServiceImpl implements DIDService interface
+type ServiceImpl struct {
+        repository DIDRepository
+}
+
+// NewService creates a new DID service
+func NewService(repo DIDRepository) DIDService <span class="cov8" title="1">{
+        return &amp;ServiceImpl{
+                repository: repo,
+        }
+}</span>
+
+// GenerateDID generates a new DID with key pair
+func (s *ServiceImpl) GenerateDID(method string) (*DID, *KeyPair, error) <span class="cov8" title="1">{
+        // Generate Ed25519 key pair
+        publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, nil, fmt.Errorf("failed to generate key pair: %w", err)
+        }</span>
+
+        // Create identifier from public key
+        <span class="cov8" title="1">identifier := base58.Encode(publicKey)
+
+        did := &amp;DID{
+                Method:     method,
+                Identifier: identifier,
+        }
+
+        keyPair := &amp;KeyPair{
+                PublicKey:  publicKey,
+                PrivateKey: privateKey,
+                KeyID:      did.String() + "#key-1",
+        }
+
+        return did, keyPair, nil</span>
+}
+
+// CreateDIDDocument creates a DID document for the given DID and key pair
+func (s *ServiceImpl) CreateDIDDocument(did *DID, keyPair *KeyPair) (*DIDDocument, error) <span class="cov8" title="1">{
+        now := time.Now()
+
+        verificationMethod := VerificationMethod{
+                ID:                 keyPair.KeyID,
+                Type:               "Ed25519VerificationKey2020",
+                Controller:         did.String(),
+                PublicKeyMultibase: "z" + base58.Encode(keyPair.PublicKey),
+        }
+
+        doc := &amp;DIDDocument{
+                Context: []string{
+                        "https://www.w3.org/ns/did/v1",
+                        "https://w3id.org/security/suites/ed25519-2020/v1",
+                },
+                ID:                 did.String(),
+                VerificationMethod: []VerificationMethod{verificationMethod},
+                Authentication:     []string{keyPair.KeyID},
+                AssertionMethod:    []string{keyPair.KeyID},
+                Created:            now,
+                Updated:            now,
+        }
+
+        return doc, nil
+}</span>
+
+// ResolveDID resolves a DID to its DID Document
+func (s *ServiceImpl) ResolveDID(didString string) (*DIDDocument, error) <span class="cov0" title="0">{
+        return s.repository.Resolve(didString)
+}</span>
+
+// VerifyDIDDocument verifies the integrity of a DID Document
+func (s *ServiceImpl) VerifyDIDDocument(doc *DIDDocument) error <span class="cov8" title="1">{
+        if doc == nil </span><span class="cov8" title="1">{
+                return fmt.Errorf("DID document is nil")
+        }</span>
+
+        <span class="cov8" title="1">if doc.ID == "" </span><span class="cov8" title="1">{
+                return fmt.Errorf("DID document ID is empty")
+        }</span>
+
+        <span class="cov8" title="1">if len(doc.VerificationMethod) == 0 </span><span class="cov8" title="1">{
+                return fmt.Errorf("DID document must have at least one verification method")
+        }</span>
+
+        // Verify that authentication methods reference valid verification methods
+        <span class="cov8" title="1">for _, authMethod := range doc.Authentication </span><span class="cov8" title="1">{
+                found := false
+                for _, vm := range doc.VerificationMethod </span><span class="cov8" title="1">{
+                        if vm.ID == authMethod </span><span class="cov8" title="1">{
+                                found = true
+                                break</span>
+                        }
+                }
+                <span class="cov8" title="1">if !found </span><span class="cov8" title="1">{
+                        return fmt.Errorf("authentication method %s not found in verification methods", authMethod)
+                }</span>
+        }
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// InMemoryRepository implements DIDRepository interface for testing
+type InMemoryRepository struct {
+        documents map[string]*DIDDocument
+}
+
+// NewInMemoryRepository creates a new in-memory DID repository
+func NewInMemoryRepository() DIDRepository <span class="cov8" title="1">{
+        return &amp;InMemoryRepository{
+                documents: make(map[string]*DIDDocument),
+        }
+}</span>
+
+// Create stores a DID document
+func (r *InMemoryRepository) Create(doc *DIDDocument) error <span class="cov8" title="1">{
+        if doc == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("DID document is nil")
+        }</span>
+        <span class="cov8" title="1">r.documents[doc.ID] = doc
+        return nil</span>
+}
+
+// Resolve retrieves a DID document by DID
+func (r *InMemoryRepository) Resolve(did string) (*DIDDocument, error) <span class="cov8" title="1">{
+        doc, exists := r.documents[did]
+        if !exists </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("DID document not found: %s", did)
+        }</span>
+        <span class="cov8" title="1">return doc, nil</span>
+}
+
+// Update updates an existing DID document
+func (r *InMemoryRepository) Update(did string, doc *DIDDocument) error <span class="cov8" title="1">{
+        if _, exists := r.documents[did]; !exists </span><span class="cov0" title="0">{
+                return fmt.Errorf("DID document not found: %s", did)
+        }</span>
+        <span class="cov8" title="1">doc.Updated = time.Now()
+        r.documents[did] = doc
+        return nil</span>
+}
+
+// Deactivate removes a DID document
+func (r *InMemoryRepository) Deactivate(did string) error <span class="cov8" title="1">{
+        delete(r.documents, did)
+        return nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package did
+
+import (
+        "crypto/ed25519"
+        "time"
+)
+
+// DID represents a Decentralized Identifier
+type DID struct {
+        Method     string `json:"method"`
+        Identifier string `json:"identifier"`
+}
+
+// String returns the full DID string
+func (d DID) String() string <span class="cov8" title="1">{
+        return "did:" + d.Method + ":" + d.Identifier
+}</span>
+
+// DIDDocument represents a DID Document structure
+type DIDDocument struct {
+        Context            []string             `json:"@context"`
+        ID                 string               `json:"id"`
+        VerificationMethod []VerificationMethod `json:"verificationMethod"`
+        Authentication     []string             `json:"authentication"`
+        AssertionMethod    []string             `json:"assertionMethod"`
+        KeyAgreement       []string             `json:"keyAgreement,omitempty"`
+        Service            []Service            `json:"service,omitempty"`
+        Created            time.Time            `json:"created"`
+        Updated            time.Time            `json:"updated"`
+}
+
+// VerificationMethod represents a verification method in DID Document
+type VerificationMethod struct {
+        ID                 string `json:"id"`
+        Type               string `json:"type"`
+        Controller         string `json:"controller"`
+        PublicKeyMultibase string `json:"publicKeyMultibase"`
+}
+
+// Service represents a service endpoint in DID Document
+type Service struct {
+        ID              string `json:"id"`
+        Type            string `json:"type"`
+        ServiceEndpoint string `json:"serviceEndpoint"`
+}
+
+// KeyPair represents a cryptographic key pair
+type KeyPair struct {
+        PublicKey  ed25519.PublicKey  `json:"publicKey"`
+        PrivateKey ed25519.PrivateKey `json:"privateKey"`
+        KeyID      string             `json:"keyId"`
+}
+
+// DIDRepository interface for DID operations
+type DIDRepository interface {
+        Create(doc *DIDDocument) error
+        Resolve(did string) (*DIDDocument, error)
+        Update(did string, doc *DIDDocument) error
+        Deactivate(did string) error
+}
+
+// DIDService interface for DID business logic
+type DIDService interface {
+        GenerateDID(method string) (*DID, *KeyPair, error)
+        CreateDIDDocument(did *DID, keyPair *KeyPair) (*DIDDocument, error)
+        ResolveDID(didString string) (*DIDDocument, error)
+        VerifyDIDDocument(doc *DIDDocument) error
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package vc
+
+import (
+        "crypto/rand"
+        "encoding/json"
+        "fmt"
+        "time"
+
+        "github.com/google/uuid"
+        "github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
+)
+
+// ServiceImpl implements CredentialService interface
+type ServiceImpl struct {
+        bbsService bbs.BBSService
+        credRepo   CredentialRepository
+        presRepo   PresentationRepository
+        keyStore   map[string]*bbs.KeyPair // DID -&gt; KeyPair mapping
+}
+
+// NewService creates a new credential service
+func NewService(bbsService bbs.BBSService, credRepo CredentialRepository, presRepo PresentationRepository) CredentialService <span class="cov8" title="1">{
+        return &amp;ServiceImpl{
+                bbsService: bbsService,
+                credRepo:   credRepo,
+                presRepo:   presRepo,
+                keyStore:   make(map[string]*bbs.KeyPair),
+        }
+}</span>
+
+// SetIssuerKeyPair sets the BBS+ key pair for an issuer DID
+func (s *ServiceImpl) SetIssuerKeyPair(issuerDID string, keyPair *bbs.KeyPair) <span class="cov8" title="1">{
+        s.keyStore[issuerDID] = keyPair
+}</span>
+
+// IssueCredential creates and signs a new verifiable credential
+func (s *ServiceImpl) IssueCredential(issuerDID string, subjectDID string, claims []Claim) (*VerifiableCredential, error) <span class="cov8" title="1">{
+        keyPair, exists := s.keyStore[issuerDID]
+        if !exists </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("no key pair found for issuer DID: %s", issuerDID)
+        }</span>
+
+        // Create credential subject
+        <span class="cov8" title="1">credentialSubject := make(map[string]interface{})
+        credentialSubject["id"] = subjectDID
+
+        // Convert claims to messages for BBS+ signing
+        var messages [][]byte
+        var claimKeys []string
+
+        for _, claim := range claims </span><span class="cov8" title="1">{
+                credentialSubject[claim.Key] = claim.Value
+                claimKeys = append(claimKeys, claim.Key)
+
+                // Convert claim value to bytes
+                valueBytes, err := json.Marshal(claim.Value)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to marshal claim value: %w", err)
+                }</span>
+                <span class="cov8" title="1">messages = append(messages, valueBytes)</span>
+        }
+
+        // Create the credential
+        <span class="cov8" title="1">now := time.Now()
+        credential := &amp;VerifiableCredential{
+                Context: []string{
+                        "https://www.w3.org/2018/credentials/v1",
+                        "https://w3id.org/security/bbs/v1",
+                },
+                ID:                uuid.New().String(),
+                Type:              []string{"VerifiableCredential"},
+                Issuer:            issuerDID,
+                IssuanceDate:      now,
+                CredentialSubject: credentialSubject,
+        }
+
+        // Sign with BBS+
+        signature, err := s.bbsService.Sign(keyPair.PrivateKey, messages)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to sign credential: %w", err)
+        }</span>
+
+        // Create proof
+        <span class="cov8" title="1">credential.Proof = &amp;Proof{
+                Type:               "BbsBlsSignature2020",
+                Created:            now,
+                VerificationMethod: issuerDID + "#bbs-key-1",
+                ProofPurpose:       "assertionMethod",
+                ProofValue:         bbs.EncodeProof(&amp;bbs.Proof{ProofValue: signature.Value}),
+        }
+
+        // Store metadata for later proof creation
+        credential.Proof.RevealedAttributes = make([]int, len(claims))
+        for i := range claims </span><span class="cov8" title="1">{
+                credential.Proof.RevealedAttributes[i] = i
+        }</span>
+
+        <span class="cov8" title="1">return credential, nil</span>
+}
+
+// VerifyCredential verifies a verifiable credential
+func (s *ServiceImpl) VerifyCredential(vc *VerifiableCredential) error <span class="cov8" title="1">{
+        if vc == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("credential is nil")
+        }</span>
+
+        <span class="cov8" title="1">if vc.Proof == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("credential has no proof")
+        }</span>
+
+        // For demonstration, we'll skip actual BBS+ verification
+        // In production, you would:
+        // 1. Resolve issuer DID to get public key
+        // 2. Reconstruct messages from credential subject
+        // 3. Verify BBS+ signature
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// CreatePresentation creates a verifiable presentation with selective disclosure
+func (s *ServiceImpl) CreatePresentation(holderDID string, credentials []*VerifiableCredential, disclosureRequests []SelectiveDisclosureRequest) (*VerifiablePresentation, error) <span class="cov8" title="1">{
+        if len(credentials) != len(disclosureRequests) </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("mismatch between credentials and disclosure requests")
+        }</span>
+
+        <span class="cov8" title="1">var presentedCredentials []interface{}
+
+        for i, credential := range credentials </span><span class="cov8" title="1">{
+                request := disclosureRequests[i]
+
+                // Create selective disclosure proof
+                derivedCredential, err := s.createSelectiveDisclosureCredential(credential, request)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to create selective disclosure: %w", err)
+                }</span>
+
+                <span class="cov8" title="1">presentedCredentials = append(presentedCredentials, derivedCredential)</span>
+        }
+
+        // Create presentation
+        <span class="cov8" title="1">presentation := &amp;VerifiablePresentation{
+                Context: []string{
+                        "https://www.w3.org/2018/credentials/v1",
+                        "https://w3id.org/security/bbs/v1",
+                },
+                ID:                   uuid.New().String(),
+                Type:                 []string{"VerifiablePresentation"},
+                Holder:               holderDID,
+                VerifiableCredential: presentedCredentials,
+        }
+
+        // Add presentation proof (simplified)
+        now := time.Now()
+        presentation.Proof = &amp;Proof{
+                Type:               "BbsBlsSignatureProof2020",
+                Created:            now,
+                VerificationMethod: holderDID + "#key-1",
+                ProofPurpose:       "authentication",
+        }
+
+        return presentation, nil</span>
+}
+
+// createSelectiveDisclosureCredential creates a derived credential with only revealed attributes
+func (s *ServiceImpl) createSelectiveDisclosureCredential(credential *VerifiableCredential, request SelectiveDisclosureRequest) (map[string]interface{}, error) <span class="cov8" title="1">{
+        // Create derived credential with only revealed attributes
+        derivedCredential := map[string]interface{}{
+                "@context":          credential.Context,
+                "id":                credential.ID,
+                "type":              credential.Type,
+                "issuer":            credential.Issuer,
+                "issuanceDate":      credential.IssuanceDate,
+                "credentialSubject": make(map[string]interface{}),
+        }
+
+        // Include subject ID
+        if subjectID, ok := credential.CredentialSubject["id"]; ok </span><span class="cov8" title="1">{
+                derivedCredential["credentialSubject"].(map[string]interface{})["id"] = subjectID
+        }</span>
+
+        // Include only revealed attributes
+        <span class="cov8" title="1">for _, attr := range request.RevealedAttributes </span><span class="cov8" title="1">{
+                if value, exists := credential.CredentialSubject[attr]; exists </span><span class="cov8" title="1">{
+                        derivedCredential["credentialSubject"].(map[string]interface{})[attr] = value
+                }</span>
+        }
+
+        // Generate nonce for proof
+        <span class="cov8" title="1">nonce := make([]byte, 32)
+        if _, err := rand.Read(nonce); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to generate nonce: %w", err)
+        }</span>
+
+        // Create selective disclosure proof
+        // In a real implementation, this would use the original BBS+ signature
+        // to create a proof for only the revealed attributes
+        <span class="cov8" title="1">derivedCredential["proof"] = map[string]interface{}{
+                "type":               "BbsBlsSignatureProof2020",
+                "created":            time.Now(),
+                "verificationMethod": credential.Proof.VerificationMethod,
+                "proofPurpose":       "assertionMethod",
+                "proofValue":         "derived-proof-placeholder",
+                "nonce":              fmt.Sprintf("%x", nonce),
+                "revealedAttributes": request.RevealedAttributes,
+        }
+
+        return derivedCredential, nil</span>
+}
+
+// VerifyPresentation verifies a verifiable presentation
+func (s *ServiceImpl) VerifyPresentation(vp *VerifiablePresentation) error <span class="cov8" title="1">{
+        if vp == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("presentation is nil")
+        }</span>
+
+        <span class="cov8" title="1">if vp.Proof == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("presentation has no proof")
+        }</span>
+
+        // Verify each credential in the presentation
+        <span class="cov8" title="1">for _, credInterface := range vp.VerifiableCredential </span><span class="cov8" title="1">{
+                // In a real implementation, you would:
+                // 1. Parse the derived credential
+                // 2. Verify the selective disclosure proof
+                // 3. Ensure only requested attributes are revealed
+                _ = credInterface
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// InMemoryCredentialRepository implements CredentialRepository interface
+type InMemoryCredentialRepository struct {
+        credentials map[string]*VerifiableCredential
+}
+
+// NewInMemoryCredentialRepository creates a new in-memory credential repository
+func NewInMemoryCredentialRepository() CredentialRepository <span class="cov8" title="1">{
+        return &amp;InMemoryCredentialRepository{
+                credentials: make(map[string]*VerifiableCredential),
+        }
+}</span>
+
+// Store stores a verifiable credential
+func (r *InMemoryCredentialRepository) Store(vc *VerifiableCredential) error <span class="cov8" title="1">{
+        if vc == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("credential is nil")
+        }</span>
+        <span class="cov8" title="1">r.credentials[vc.ID] = vc
+        return nil</span>
+}
+
+// Retrieve retrieves a verifiable credential by ID
+func (r *InMemoryCredentialRepository) Retrieve(id string) (*VerifiableCredential, error) <span class="cov8" title="1">{
+        vc, exists := r.credentials[id]
+        if !exists </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("credential not found: %s", id)
+        }</span>
+        <span class="cov8" title="1">return vc, nil</span>
+}
+
+// List lists all credentials for a holder DID
+func (r *InMemoryCredentialRepository) List(holderDID string) ([]*VerifiableCredential, error) <span class="cov8" title="1">{
+        var credentials []*VerifiableCredential
+        for _, vc := range r.credentials </span><span class="cov8" title="1">{
+                if subjectID, ok := vc.CredentialSubject["id"].(string); ok &amp;&amp; subjectID == holderDID </span><span class="cov8" title="1">{
+                        credentials = append(credentials, vc)
+                }</span>
+        }
+        <span class="cov8" title="1">return credentials, nil</span>
+}
+
+// InMemoryPresentationRepository implements PresentationRepository interface
+type InMemoryPresentationRepository struct {
+        presentations map[string]*VerifiablePresentation
+}
+
+// NewInMemoryPresentationRepository creates a new in-memory presentation repository
+func NewInMemoryPresentationRepository() PresentationRepository <span class="cov8" title="1">{
+        return &amp;InMemoryPresentationRepository{
+                presentations: make(map[string]*VerifiablePresentation),
+        }
+}</span>
+
+// Store stores a verifiable presentation
+func (r *InMemoryPresentationRepository) Store(vp *VerifiablePresentation) error <span class="cov8" title="1">{
+        if vp == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("presentation is nil")
+        }</span>
+        <span class="cov8" title="1">r.presentations[vp.ID] = vp
+        return nil</span>
+}
+
+// Retrieve retrieves a verifiable presentation by ID
+func (r *InMemoryPresentationRepository) Retrieve(id string) (*VerifiablePresentation, error) <span class="cov0" title="0">{
+        vp, exists := r.presentations[id]
+        if !exists </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("presentation not found: %s", id)
+        }</span>
+        <span class="cov0" title="0">return vp, nil</span>
+}
+
+// List lists all presentations for a holder DID
+func (r *InMemoryPresentationRepository) List(holderDID string) ([]*VerifiablePresentation, error) <span class="cov0" title="0">{
+        var presentations []*VerifiablePresentation
+        for _, vp := range r.presentations </span><span class="cov0" title="0">{
+                if vp.Holder == holderDID </span><span class="cov0" title="0">{
+                        presentations = append(presentations, vp)
+                }</span>
+        }
+        <span class="cov0" title="0">return presentations, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
