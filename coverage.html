@@ -55,21 +55,21 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/lugon/bbs-selective-disclosure-example/cmd/demo/main.go (0.0%)</option>
+				<option value="file0">github.com/lugondev/bbs-selective-disclosure-example/cmd/demo/main.go (0.0%)</option>
 				
-				<option value="file1">github.com/lugon/bbs-selective-disclosure-example/internal/holder/usecase.go (61.0%)</option>
+				<option value="file1">github.com/lugondev/bbs-selective-disclosure-example/internal/holder/usecase.go (61.0%)</option>
 				
-				<option value="file2">github.com/lugon/bbs-selective-disclosure-example/internal/issuer/usecase.go (65.2%)</option>
+				<option value="file2">github.com/lugondev/bbs-selective-disclosure-example/internal/issuer/usecase.go (65.2%)</option>
 				
-				<option value="file3">github.com/lugon/bbs-selective-disclosure-example/internal/verifier/usecase.go (59.7%)</option>
+				<option value="file3">github.com/lugondev/bbs-selective-disclosure-example/internal/verifier/usecase.go (59.7%)</option>
 				
-				<option value="file4">github.com/lugon/bbs-selective-disclosure-example/pkg/bbs/service.go (94.5%)</option>
+				<option value="file4">github.com/lugondev/bbs-selective-disclosure-example/pkg/bbs/service.go (94.5%)</option>
 				
-				<option value="file5">github.com/lugon/bbs-selective-disclosure-example/pkg/did/service.go (90.9%)</option>
+				<option value="file5">github.com/lugondev/bbs-selective-disclosure-example/pkg/did/service.go (90.9%)</option>
 				
-				<option value="file6">github.com/lugon/bbs-selective-disclosure-example/pkg/did/types.go (100.0%)</option>
+				<option value="file6">github.com/lugondev/bbs-selective-disclosure-example/pkg/did/types.go (100.0%)</option>
 				
-				<option value="file7">github.com/lugon/bbs-selective-disclosure-example/pkg/vc/service.go (75.6%)</option>
+				<option value="file7">github.com/lugondev/bbs-selective-disclosure-example/pkg/vc/service.go (75.6%)</option>
 				
 				</select>
 			</div>
@@ -91,12 +91,12 @@ import (
         "log"
         "time"
 
-        "github.com/lugon/bbs-selective-disclosure-example/internal/holder"
-        "github.com/lugon/bbs-selective-disclosure-example/internal/issuer"
-        "github.com/lugon/bbs-selective-disclosure-example/internal/verifier"
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/did"
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+        "github.com/lugondev/bbs-selective-disclosure-example/internal/holder"
+        "github.com/lugondev/bbs-selective-disclosure-example/internal/issuer"
+        "github.com/lugondev/bbs-selective-disclosure-example/internal/verifier"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/bbs"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/did"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 )
 
 func main() <span class="cov0" title="0">{
@@ -306,8 +306,8 @@ func calculateAge(dateOfBirth string) int <span class="cov0" title="0">{
 import (
         "fmt"
 
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/did"
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/did"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 )
 
 // UseCase represents the holder use case
@@ -445,9 +445,9 @@ func (uc *UseCase) GetCredential(credentialID string) (*vc.VerifiableCredential,
 import (
         "fmt"
 
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/did"
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/bbs"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/did"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 )
 
 // UseCase represents the issuer use case
@@ -546,8 +546,8 @@ func (uc *UseCase) VerifyCredential(credential *vc.VerifiableCredential) error <
 import (
         "fmt"
 
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/did"
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/did"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 )
 
 // UseCase represents the verifier use case
@@ -1192,7 +1192,7 @@ import (
         "time"
 
         "github.com/google/uuid"
-        "github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
+        "github.com/lugondev/bbs-selective-disclosure-example/pkg/bbs"
 )
 
 // ServiceImpl implements CredentialService interface

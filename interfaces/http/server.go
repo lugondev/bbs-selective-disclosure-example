@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/lugon/bbs-selective-disclosure-example/interfaces/http/handlers"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/holder"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/issuer"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/verifier"
+	"github.com/lugondev/bbs-selective-disclosure-example/interfaces/http/handlers"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/holder"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/issuer"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/verifier"
 )
 
 // Server represents the HTTP server

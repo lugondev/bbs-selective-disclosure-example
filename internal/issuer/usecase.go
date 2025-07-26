@@ -3,9 +3,9 @@ package issuer
 import (
 	"fmt"
 
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/did"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/bbs"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/did"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 )
 
 // UseCase represents the issuer use case

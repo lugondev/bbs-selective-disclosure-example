@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/lugon/bbs-selective-disclosure-example/interfaces/http/dto"
+	"github.com/lugondev/bbs-selective-disclosure-example/interfaces/http/dto"
 )
 
 // HealthHandler handles health check requests

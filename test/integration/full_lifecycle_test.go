@@ -6,12 +6,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lugon/bbs-selective-disclosure-example/internal/holder"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/issuer"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/verifier"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/did"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/holder"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/issuer"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/verifier"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/bbs"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/did"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 )
 
 // TestFullLifecycle tests the complete DID -> VC -> VP workflow

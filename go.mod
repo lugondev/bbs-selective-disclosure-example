@@ -1,4 +1,4 @@
-module github.com/lugon/bbs-selective-disclosure-example
+module github.com/lugondev/bbs-selective-disclosure-example
 
 go 1.23.8
 

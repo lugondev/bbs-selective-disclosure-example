@@ -3,7 +3,7 @@ package vc
 import (
 	"time"
 
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/bbs"
 )
 
 // VerifiableCredential represents a W3C Verifiable Credential

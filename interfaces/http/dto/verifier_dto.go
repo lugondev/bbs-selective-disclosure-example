@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+import "github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 
 // SetupVerifierRequest represents the request to setup a verifier
 type SetupVerifierRequest struct {

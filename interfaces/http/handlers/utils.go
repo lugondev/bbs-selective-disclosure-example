@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/lugon/bbs-selective-disclosure-example/interfaces/http/dto"
+	"github.com/lugondev/bbs-selective-disclosure-example/interfaces/http/dto"
 )
 
 // writeErrorResponse writes an error response to the HTTP response writer

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/lugon/bbs-selective-disclosure-example/interfaces/http/dto"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/issuer"
+	"github.com/lugondev/bbs-selective-disclosure-example/interfaces/http/dto"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/issuer"
 )
 
 // IssuerHandler handles issuer-related HTTP requests

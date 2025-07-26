@@ -5,13 +5,13 @@ import (
 	"log"
 	"os"
 
-	httpServer "github.com/lugon/bbs-selective-disclosure-example/interfaces/http"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/holder"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/issuer"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/verifier"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/did"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+	httpServer "github.com/lugondev/bbs-selective-disclosure-example/interfaces/http"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/holder"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/issuer"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/verifier"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/bbs"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/did"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 )
 
 func main() {

@@ -6,12 +6,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/lugon/bbs-selective-disclosure-example/internal/holder"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/issuer"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/verifier"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/bbs"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/did"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/holder"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/issuer"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/verifier"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/bbs"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/did"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 )
 
 func main() {

@@ -3,8 +3,8 @@ package holder
 import (
 	"fmt"
 
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/did"
-	"github.com/lugon/bbs-selective-disclosure-example/pkg/vc"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/did"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 )
 
 // UseCase represents the holder use case

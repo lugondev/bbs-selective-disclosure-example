@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/lugon/bbs-selective-disclosure-example/interfaces/http/dto"
-	"github.com/lugon/bbs-selective-disclosure-example/internal/holder"
+	"github.com/lugondev/bbs-selective-disclosure-example/interfaces/http/dto"
+	"github.com/lugondev/bbs-selective-disclosure-example/internal/holder"
 )
 
 // HolderHandler handles holder-related HTTP requests
