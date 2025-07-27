@@ -15,7 +15,7 @@ func TestGenerateKeyPair(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.NotNil(t, keyPair)
-	assert.Len(t, keyPair.PublicKey, 32)
+	assert.Len(t, keyPair.PublicKey, 192) // G2 point is 192 bytes
 	assert.Len(t, keyPair.PrivateKey, 32)
 
 	// Ensure different key pairs are generated
@@ -41,7 +41,9 @@ func TestSignAndVerify(t *testing.T) {
 		signature, err := service.Sign(keyPair.PrivateKey, messages)
 		require.NoError(t, err)
 		assert.NotNil(t, signature)
-		assert.Len(t, signature.Value, 32)
+		assert.Len(t, signature.A, 96) // G1 point is 96 bytes
+		assert.Len(t, signature.E, 32) // Scalar is 32 bytes
+		assert.Len(t, signature.S, 32) // Scalar is 32 bytes
 
 		err = service.Verify(keyPair.PublicKey, signature, messages)
 		assert.NoError(t, err)
@@ -91,7 +93,9 @@ func TestCreateAndVerifyProof(t *testing.T) {
 		assert.NotNil(t, proof)
 		assert.Equal(t, revealedIndices, proof.RevealedAttributes)
 		assert.Equal(t, nonce, proof.Nonce)
-		assert.Len(t, proof.ProofValue, 32)
+		assert.Len(t, proof.A_prime, 96) // G1 point
+		assert.Len(t, proof.A_bar, 96)   // G1 point
+		assert.Len(t, proof.C, 32)       // Challenge hash
 
 		// Verify proof with revealed messages
 		revealedMessages := [][]byte{
@@ -179,7 +183,8 @@ func TestEncodeDecodeProof(t *testing.T) {
 		decoded, err := DecodeProof(encoded, revealedIndices)
 		require.NoError(t, err)
 
-		assert.Equal(t, proof.ProofValue, decoded.ProofValue)
+		assert.Equal(t, proof.A_prime, decoded.A_prime)
+		assert.Equal(t, proof.A_bar, decoded.A_bar)
 		assert.Equal(t, proof.RevealedAttributes, decoded.RevealedAttributes)
 		// Note: decoded nonce will include additional data, so we check length
 		assert.True(t, len(decoded.Nonce) >= len(proof.Nonce))

@@ -383,7 +383,7 @@ func TestBBSOperations(t *testing.T) {
 		assert.NotNil(t, keyPair.PublicKey)
 		assert.NotNil(t, keyPair.PrivateKey)
 		assert.Len(t, keyPair.PrivateKey, 32)
-		assert.Len(t, keyPair.PublicKey, 32)
+		assert.Len(t, keyPair.PublicKey, 192) // G2 point is 192 bytes
 
 		// Sign messages
 		messages := [][]byte{
@@ -395,7 +395,7 @@ func TestBBSOperations(t *testing.T) {
 		signature, err := bbsService.Sign(keyPair.PrivateKey, messages)
 		require.NoError(t, err)
 		assert.NotNil(t, signature)
-		assert.Len(t, signature.Value, 32)
+		assert.Len(t, signature.A, 96) // G1 point is 96 bytes
 
 		// Verify signature
 		err = bbsService.Verify(keyPair.PublicKey, signature, messages)

@@ -86,7 +86,11 @@ func (s *ServiceImpl) IssueCredential(issuerDID string, subjectDID string, claim
 		Created:            now,
 		VerificationMethod: issuerDID + "#bbs-key-1",
 		ProofPurpose:       "assertionMethod",
-		ProofValue:         bbs.EncodeProof(&bbs.Proof{ProofValue: signature.Value}),
+		ProofValue: bbs.EncodeProof(&bbs.Proof{
+			A_prime: signature.A,
+			A_bar:   signature.E,
+			C:       signature.S,
+		}),
 	}
 
 	// Store metadata for later proof creation
