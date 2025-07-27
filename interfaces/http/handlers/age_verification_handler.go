@@ -127,9 +127,9 @@ func (h *AgeVerificationHandler) IssueAgeCredential(w http.ResponseWriter, r *ht
 	}
 
 	response := map[string]interface{}{
-		"success":         true,
-		"credential":      credential,
-		"currentAge":      currentAge,
+		"success":    true,
+		"credential": credential,
+		"currentAge": currentAge,
 		"ageVerification": map[string]bool{
 			"ageOver13": currentAge >= 13,
 			"ageOver16": currentAge >= 16,
@@ -192,7 +192,7 @@ func (h *AgeVerificationHandler) VerifyAge(w http.ResponseWriter, r *http.Reques
 		Nonce:               verificationNonce,
 	})
 	if err != nil {
-		writeErrorResponse(w, "Failed to create presentation", http.StatusInternalServerError, 
+		writeErrorResponse(w, "Failed to create presentation", http.StatusInternalServerError,
 			fmt.Sprintf("Could not create presentation for credential %s. Error: %v", req.CredentialID, err))
 		return
 	}
@@ -261,46 +261,46 @@ func (h *AgeVerificationHandler) VerifyAge(w http.ResponseWriter, r *http.Reques
 func (h *AgeVerificationHandler) GetAgeScenarios(w http.ResponseWriter, r *http.Request) {
 	scenarios := []map[string]interface{}{
 		{
-			"service":       "Social Media",
-			"minAge":        13,
-			"claimKey":      "ageOver13",
-			"description":   "Access to social media platforms",
-			"privacyLevel":  "High - Only verifies 13+ status",
+			"service":      "Social Media",
+			"minAge":       13,
+			"claimKey":     "ageOver13",
+			"description":  "Access to social media platforms",
+			"privacyLevel": "High - Only verifies 13+ status",
 		},
 		{
-			"service":       "Movie Theater (PG-13)",
-			"minAge":        13,
-			"claimKey":      "ageOver13",
-			"description":   "Access to PG-13 rated movies",
-			"privacyLevel":  "High - Only verifies 13+ status",
+			"service":      "Movie Theater (PG-13)",
+			"minAge":       13,
+			"claimKey":     "ageOver13",
+			"description":  "Access to PG-13 rated movies",
+			"privacyLevel": "High - Only verifies 13+ status",
 		},
 		{
-			"service":       "Movie Theater (R-rated)",
-			"minAge":        16,
-			"claimKey":      "ageOver16",
-			"description":   "Access to R-rated movies (approximated with 16+)",
-			"privacyLevel":  "High - Only verifies 16+ status",
+			"service":      "Movie Theater (R-rated)",
+			"minAge":       16,
+			"claimKey":     "ageOver16",
+			"description":  "Access to R-rated movies (approximated with 16+)",
+			"privacyLevel": "High - Only verifies 16+ status",
 		},
 		{
-			"service":       "Online Gaming",
-			"minAge":        18,
-			"claimKey":      "ageOver18",
-			"description":   "Access to adult gaming content",
-			"privacyLevel":  "High - Only verifies 18+ status",
+			"service":      "Online Gaming",
+			"minAge":       18,
+			"claimKey":     "ageOver18",
+			"description":  "Access to adult gaming content",
+			"privacyLevel": "High - Only verifies 18+ status",
 		},
 		{
-			"service":       "Alcohol Purchase",
-			"minAge":        21,
-			"claimKey":      "ageOver21",
-			"description":   "Purchase alcoholic beverages",
-			"privacyLevel":  "High - Only verifies 21+ status",
+			"service":      "Alcohol Purchase",
+			"minAge":       21,
+			"claimKey":     "ageOver21",
+			"description":  "Purchase alcoholic beverages",
+			"privacyLevel": "High - Only verifies 21+ status",
 		},
 		{
-			"service":       "Senior Discount",
-			"minAge":        65,
-			"claimKey":      "ageOver65",
-			"description":   "Eligibility for senior citizen discounts",
-			"privacyLevel":  "High - Only verifies 65+ status",
+			"service":      "Senior Discount",
+			"minAge":       65,
+			"claimKey":     "ageOver65",
+			"description":  "Eligibility for senior citizen discounts",
+			"privacyLevel": "High - Only verifies 65+ status",
 		},
 	}
 

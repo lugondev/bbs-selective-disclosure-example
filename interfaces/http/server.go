@@ -14,13 +14,13 @@ import (
 
 // Server represents the HTTP server
 type Server struct {
-	issuerHandler           *handlers.IssuerHandler
-	holderHandler           *handlers.HolderHandler
-	verifierHandler         *handlers.VerifierHandler
-	ageVerificationHandler  *handlers.AgeVerificationHandler
-	healthHandler           *handlers.HealthHandler
-	bbsHandler              *handlers.BBSHandler
-	port                    string
+	issuerHandler          *handlers.IssuerHandler
+	holderHandler          *handlers.HolderHandler
+	verifierHandler        *handlers.VerifierHandler
+	ageVerificationHandler *handlers.AgeVerificationHandler
+	healthHandler          *handlers.HealthHandler
+	bbsHandler             *handlers.BBSHandler
+	port                   string
 }
 
 // NewServer creates a new HTTP server
@@ -32,13 +32,13 @@ func NewServer(
 	port string,
 ) *Server {
 	return &Server{
-		issuerHandler:           handlers.NewIssuerHandler(issuerUC),
-		holderHandler:           handlers.NewHolderHandler(holderUC),
-		verifierHandler:         handlers.NewVerifierHandler(verifierUC),
-		ageVerificationHandler:  handlers.NewAgeVerificationHandler(issuerUC, holderUC, verifierUC),
-		healthHandler:           handlers.NewHealthHandler(),
-		bbsHandler:              handlers.NewBBSHandler(bbsFactory),
-		port:                    port,
+		issuerHandler:          handlers.NewIssuerHandler(issuerUC),
+		holderHandler:          handlers.NewHolderHandler(holderUC),
+		verifierHandler:        handlers.NewVerifierHandler(verifierUC),
+		ageVerificationHandler: handlers.NewAgeVerificationHandler(issuerUC, holderUC, verifierUC),
+		healthHandler:          handlers.NewHealthHandler(),
+		bbsHandler:             handlers.NewBBSHandler(bbsFactory),
+		port:                   port,
 	}
 }
 
