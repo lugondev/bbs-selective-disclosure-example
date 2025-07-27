@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Verification Demo - BBS+ Selective Disclosure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .demo-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+
+        .response-area {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .response-area.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .response-area.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .privacy-demo {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .privacy-demo h3 {
+            margin-bottom: 15px;
+        }
+
+        .privacy-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .revealed-info, .hidden-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .revealed-info h4 {
+            color: #a8e6cf;
+            margin-bottom: 10px;
+        }
+
+        .hidden-info h4 {
+            color: #ffb3ba;
+            margin-bottom: 10px;
+        }
+
+        .age-scenario {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .age-scenario.eligible {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .age-scenario.not-eligible {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .flow-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .flow-step {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            margin: 0 10px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .flow-step.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .flow-step h4 {
+            margin-bottom: 10px;
+        }
+
+        .arrow {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .logs {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .log-entry.info {
+            color: #63b3ed;
+        }
+
+        .log-entry.success {
+            color: #68d391;
+        }
+
+        .log-entry.error {
+            color: #fc8181;
+        }
+
+        .log-entry.warning {
+            color: #fbd38d;
+        }
+
+        .navigation {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .navigation a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.3s;
+        }
+
+        .navigation a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .demo-section {
+                padding: 20px;
+            }
+
+            .flow-indicator {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+            }
+
+            .privacy-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Age Verification Demo</h1>
+            <p>Privacy-preserving age verification without revealing exact age or personal details</p>
+        </div>
+
+        <div class="navigation">
+            <a href="index.html">← Back to Main Demo</a>
+            <a href="#demo-section">Quick Demo</a>
+            <a href="#scenarios">Age Scenarios</a>
+        </div>
+
+        <!-- Privacy Protection Overview -->
+        <div class="privacy-demo">
+            <h3>🛡️ Privacy Protection Overview</h3>
+            <div class="privacy-list">
+                <div class="revealed-info">
+                    <h4>✅ What Services CAN See:</h4>
+                    <ul>
+                        <li>Age verification (18+ = true/false)</li>
+                        <li>Nationality (for regional content)</li>
+                        <li>Document type (government-issued)</li>
+                        <li>Verification from trusted authority</li>
+                    </ul>
+                </div>
+                <div class="hidden-info">
+                    <h4>🔒 What Remains PRIVATE:</h4>
+                    <ul>
+                        <li>Exact age (could be 18, 25, 35, 50...)</li>
+                        <li>Birth date (month/day/year)</li>
+                        <li>Real name (first/last name)</li>
+                        <li>Home address</li>
+                        <li>ID number</li>
+                        <li>Birth year</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flow Indicator -->
+        <div class="flow-indicator">
+            <div class="flow-step" id="step-1">
+                <h4>1. Setup Entities</h4>
+                <p>Government, Citizen & Service</p>
+            </div>
+            <div class="arrow">→</div>
+            <div class="flow-step" id="step-2">
+                <h4>2. Issue Enhanced ID</h4>
+                <p>Digital ID with age claims</p>
+            </div>
+            <div class="arrow">→</div>
+            <div class="flow-step" id="step-3">
+                <h4>3. Age Verification</h4>
+                <p>Privacy-preserving proof</p>
+            </div>
+            <div class="arrow">→</div>
+            <div class="flow-step" id="step-4">
+                <h4>4. Access Decision</h4>
+                <p>Grant/deny based on age</p>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Government Section -->
+            <div class="demo-section">
+                <h2 class="section-title">🏛️ Government Authority (Digital ID Issuer)</h2>
+                
+                <div class="form-group">
+                    <button class="btn" onclick="setupGovernment()">Setup Government Authority</button>
+                    <span id="government-status" class="status-badge pending">Not Setup</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Government DID:</label>
+                    <input type="text" id="government-did" readonly placeholder="Click Setup Government first">
+                </div>
+
+                <h3>Issue Enhanced Digital ID</h3>
+                <div class="form-group">
+                    <label>Citizen DID:</label>
+                    <input type="text" id="enhanced-citizen-did" placeholder="Enter citizen DID">
+                </div>
+
+                <div class="form-group">
+                    <label>First Name:</label>
+                    <input type="text" id="enhanced-firstname" value="Minh">
+                </div>
+
+                <div class="form-group">
+                    <label>Last Name:</label>
+                    <input type="text" id="enhanced-lastname" value="Tran Duc">
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth:</label>
+                    <input type="date" id="enhanced-dob" value="1995-03-15">
+                </div>
+
+                <div class="form-group">
+                    <label>Nationality:</label>
+                    <input type="text" id="enhanced-nationality" value="Vietnamese">
+                </div>
+
+                <div class="form-group">
+                    <label>Address:</label>
+                    <input type="text" id="enhanced-address" value="456 Le Loi St, District 1, Ho Chi Minh City">
+                </div>
+
+                <div class="form-group">
+                    <label>ID Number:</label>
+                    <input type="text" id="enhanced-idnumber" value="987654321">
+                </div>
+
+                <button class="btn btn-success" onclick="issueEnhancedCredential()">Issue Enhanced Digital ID</button>
+
+                <div id="government-response" class="response-area" style="display: none;"></div>
+            </div>
+
+            <!-- Citizen Section -->
+            <div class="demo-section">
+                <h2 class="section-title">👤 Citizen (Credential Holder)</h2>
+                
+                <div class="form-group">
+                    <button class="btn" onclick="setupCitizen()">Setup Citizen</button>
+                    <span id="citizen-status" class="status-badge pending">Not Setup</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Citizen DID:</label>
+                    <input type="text" id="citizen-did" readonly placeholder="Click Setup Citizen first">
+                </div>
+
+                <h3>Age Verification Capabilities</h3>
+                <div id="age-capabilities" class="response-area" style="display: none;"></div>
+
+                <button class="btn btn-warning" onclick="showAgeCapabilities()">Show My Age Verification Capabilities</button>
+
+                <div id="citizen-response" class="response-area" style="display: none;"></div>
+            </div>
+
+            <!-- Service Provider Section -->
+            <div class="demo-section">
+                <h2 class="section-title">🎮 Service Provider (Age-Restricted Platform)</h2>
+                
+                <div class="form-group">
+                    <label>Service Type:</label>
+                    <select id="service-type">
+                        <option value="gaming">Online Gaming Platform</option>
+                        <option value="cinema">Movie Theater</option>
+                        <option value="alcohol">Alcohol Retailer</option>
+                        <option value="social">Social Media Platform</option>
+                        <option value="senior">Senior Services</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Minimum Age Required:</label>
+                    <select id="min-age-required">
+                        <option value="13">13+ (Social Media, PG-13 Movies)</option>
+                        <option value="16">16+ (Some Regional Content)</option>
+                        <option value="18" selected>18+ (Adult Gaming, R-rated Movies)</option>
+                        <option value="21">21+ (Alcohol Purchase)</option>
+                        <option value="65">65+ (Senior Discounts)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Credential ID:</label>
+                    <input type="text" id="verification-credential-id" placeholder="Enter credential ID from issued credential">
+                </div>
+
+                <div class="form-group">
+                    <label>Citizen DID:</label>
+                    <input type="text" id="verification-citizen-did" placeholder="Enter citizen DID">
+                </div>
+
+                <button class="btn btn-success" onclick="verifyAge()">Verify Age (Privacy-Preserving)</button>
+
+                <div id="verification-result" class="response-area" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Age Scenarios Section -->
+        <div class="demo-section" id="scenarios">
+            <h2 class="section-title">🎯 Age Verification Scenarios</h2>
+            <p>Test different age requirements and see how privacy is preserved:</p>
+            
+            <button class="btn" onclick="loadAgeScenarios()">Load Age Scenarios</button>
+            
+            <div id="age-scenarios-list"></div>
+        </div>
+
+        <!-- Demo Automation -->
+        <div class="demo-section" id="demo-section">
+            <h2 class="section-title">🚀 Quick Age Verification Demo</h2>
+            <p>Run the complete age verification flow automatically:</p>
+            
+            <div class="form-group">
+                <label>Demo Service Type:</label>
+                <select id="demo-service-type">
+                    <option value="gaming">Gaming Platform (18+)</option>
+                    <option value="alcohol">Alcohol Store (21+)</option>
+                    <option value="social">Social Media (13+)</option>
+                    <option value="senior">Senior Services (65+)</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-success" onclick="runFullAgeDemo()">Run Full Age Demo</button>
+            <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
+            
+            <div id="demo-logs" class="logs" style="display: none;">
+                <div style="color: #63b3ed; margin-bottom: 10px;">📋 Age Verification Demo Log:</div>
+            </div>
+        </div>
+
+        <!-- Privacy Achievements -->
+        <div class="demo-section">
+            <h2 class="section-title">🏆 Privacy Achievements</h2>
+            <div class="grid">
+                <div class="privacy-demo">
+                    <h3>🎯 Zero-Knowledge Age Proof</h3>
+                    <p>Prove age ≥ 18 without revealing exact age (could be 18, 25, 35, 50, etc.)</p>
+                </div>
+                <div class="privacy-demo">
+                    <h3>🔒 Personal Data Protection</h3>
+                    <p>Name, address, ID number, and birth date remain completely private</p>
+                </div>
+                <div class="privacy-demo">
+                    <h3>🎪 Unlinkable Verifications</h3>
+                    <p>Each verification is unlinkable - no tracking across services</p>
+                </div>
+                <div class="privacy-demo">
+                    <h3>✅ Regulatory Compliance</h3>
+                    <p>Meet age verification requirements while maximizing user privacy</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="age-verification.js"></script>
+</body>
+</html>

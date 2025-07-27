@@ -14,12 +14,13 @@ import (
 
 // Server represents the HTTP server
 type Server struct {
-	issuerHandler   *handlers.IssuerHandler
-	holderHandler   *handlers.HolderHandler
-	verifierHandler *handlers.VerifierHandler
-	healthHandler   *handlers.HealthHandler
-	bbsHandler      *handlers.BBSHandler
-	port            string
+	issuerHandler           *handlers.IssuerHandler
+	holderHandler           *handlers.HolderHandler
+	verifierHandler         *handlers.VerifierHandler
+	ageVerificationHandler  *handlers.AgeVerificationHandler
+	healthHandler           *handlers.HealthHandler
+	bbsHandler              *handlers.BBSHandler
+	port                    string
 }
 
 // NewServer creates a new HTTP server
@@ -31,12 +32,13 @@ func NewServer(
 	port string,
 ) *Server {
 	return &Server{
-		issuerHandler:   handlers.NewIssuerHandler(issuerUC),
-		holderHandler:   handlers.NewHolderHandler(holderUC),
-		verifierHandler: handlers.NewVerifierHandler(verifierUC),
-		healthHandler:   handlers.NewHealthHandler(),
-		bbsHandler:      handlers.NewBBSHandler(bbsFactory),
-		port:            port,
+		issuerHandler:           handlers.NewIssuerHandler(issuerUC),
+		holderHandler:           handlers.NewHolderHandler(holderUC),
+		verifierHandler:         handlers.NewVerifierHandler(verifierUC),
+		ageVerificationHandler:  handlers.NewAgeVerificationHandler(issuerUC, holderUC, verifierUC),
+		healthHandler:           handlers.NewHealthHandler(),
+		bbsHandler:              handlers.NewBBSHandler(bbsFactory),
+		port:                    port,
 	}
 }
 
@@ -67,6 +69,12 @@ func (s *Server) Start() error {
 	// BBS endpoints
 	mux.HandleFunc("/api/bbs/test", s.bbsHandler.TestProvider)
 	mux.HandleFunc("/api/bbs/benchmark", s.bbsHandler.BenchmarkProviders)
+
+	// Age Verification endpoints
+	mux.HandleFunc("/api/age-verification/credential", s.ageVerificationHandler.IssueAgeCredential)
+	mux.HandleFunc("/api/age-verification/verify", s.ageVerificationHandler.VerifyAge)
+	mux.HandleFunc("/api/age-verification/scenarios", s.ageVerificationHandler.GetAgeScenarios)
+	mux.HandleFunc("/api/age-verification/demo", s.ageVerificationHandler.RunAgeDemo)
 
 	// Serve static files (for the web UI)
 	webDir := "./web/"

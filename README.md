@@ -95,7 +95,34 @@ go run ./cmd/interface_demo switching
 go run ./cmd/interface_demo all
 ```
 
-### 4. Run HTTP Server with Web UI
+### 4. Run Age Verification Demo (NEW!)
+```bash
+# Run age verification demo (18+ without revealing exact age)
+make age-demo
+
+# Or build and run
+make build-age-demo
+./bin/age_verification_demo
+
+# Start web UI for age verification
+./start-age-verification-demo.sh
+# Then visit: http://localhost:8089/age-verification.html
+```
+
+📖 **[Age Verification Demo Documentation](docs/age_verification_demo.md)**
+
+This demo shows how to prove age ≥18 without revealing:
+- Exact age or birth date
+- Personal information (name, address)
+- Only reveals: ageOver18 (boolean), nationality, document type
+
+🌐 **Web UI Features:**
+- Interactive age verification flow
+- Real-time privacy protection demonstration
+- Multiple age scenarios (13+, 18+, 21+, 65+)
+- Visual privacy comparison (revealed vs hidden data)
+
+### 5. Run HTTP Server with Web UI
 ```bash
 # Method 1: Using Makefile
 make run-server
@@ -116,7 +143,7 @@ The server will start on `http://localhost:8089` by default and provide:
 - 📡 **REST API**: HTTP endpoints at `http://localhost:8089/api/*`
 - 🏥 **Health Check**: Status endpoint at `http://localhost:8089/health`
 
-### 5. Run CLI Demo
+### 6. Run CLI Demo
 ```bash
 # Method 1: Using Makefile
 make run-demo
@@ -129,7 +156,7 @@ make build
 ./bin/demo
 ```
 
-### 5. Run tests
+### 7. Run tests
 ```bash
 # Run all tests
 make test

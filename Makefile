@@ -4,6 +4,7 @@
 help:
 	@echo "Available targets:"
 	@echo "  build            - Build the demo application"
+	@echo "  build-age-demo   - Build the age verification demo application"
 	@echo "  build-interface  - Build the interface demo application"
 	@echo "  build-server     - Build the HTTP server application"
 	@echo "  build-all        - Build all applications"
@@ -11,9 +12,11 @@ help:
 	@echo "  test-unit        - Run unit tests only"
 	@echo "  test-integration - Run integration tests only"
 	@echo "  run-demo         - Run the demo application"
+	@echo "  run-age-demo     - Run the age verification demo application"
 	@echo "  run-interface    - Run the interface demo application"
 	@echo "  run-server       - Run the HTTP server with web UI"
 	@echo "  demo             - Run demo without building"
+	@echo "  age-demo         - Run age verification demo without building"
 	@echo "  interface        - Run interface demo without building"
 	@echo "  interface-config - Run interface configuration demo"
 	@echo "  interface-switching - Run interface provider switching demo"
@@ -28,6 +31,11 @@ build:
 	@echo "Building demo application..."
 	go build -o bin/demo ./cmd/demo
 
+# Build the age verification demo application
+build-age-demo:
+	@echo "Building age verification demo application..."
+	go build -o bin/age_verification_demo ./cmd/age_verification_demo
+
 # Build the interface demo application
 build-interface:
 	@echo "Building interface demo application..."
@@ -39,7 +47,7 @@ build-server:
 	go build -o bin/server ./cmd/server
 
 # Build all applications
-build-all: build build-interface build-server
+build-all: build build-age-demo build-interface build-server
 
 # Run all tests
 test: fmt vet test-unit test-integration
@@ -58,6 +66,11 @@ test-integration:
 run-demo: build
 	@echo "Running BBS+ Selective Disclosure Demo..."
 	./bin/demo
+
+# Run the age verification demo application
+run-age-demo: build-age-demo
+	@echo "Running BBS+ Age Verification Demo..."
+	./bin/age_verification_demo
 
 # Run the interface demo application
 run-interface: build-interface
@@ -82,6 +95,11 @@ server:
 demo:
 	@echo "Running BBS+ Selective Disclosure Demo..."
 	go run ./cmd/demo
+
+# Run age verification demo without building (go run)
+age-demo:
+	@echo "Running BBS+ Age Verification Demo..."
+	go run ./cmd/age_verification_demo
 
 # Run interface demo without building (go run)
 interface:
