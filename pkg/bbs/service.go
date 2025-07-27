@@ -38,7 +38,7 @@ type Proof struct {
 	Nonce              []byte   `json:"nonce"`
 }
 
-// BBSService interface for BBS+ operations
+// BBSService interface for BBS+ operations (deprecated - use BBSInterface)
 type BBSService interface {
 	GenerateKeyPair() (*KeyPair, error)
 	Sign(privateKey []byte, messages [][]byte) (*Signature, error)
@@ -60,7 +60,7 @@ type ProductionService struct {
 	engine *bls12381.Engine
 }
 
-// NewService creates a new BBS+ service with real cryptography
+// NewService creates a new BBS+ service with real cryptography (deprecated - use NewProductionBBSService)
 func NewService() BBSService {
 	return &ProductionService{
 		g1:     bls12381.NewG1(),
@@ -68,6 +68,12 @@ func NewService() BBSService {
 		gt:     bls12381.NewGT(),
 		engine: bls12381.NewEngine(),
 	}
+}
+
+// NewBBSServiceLegacy creates a new BBS+ service (deprecated - use NewBBSService)
+func NewBBSServiceLegacy() BBSInterface {
+	service, _ := NewProductionBBSService()
+	return service
 }
 
 // generateRandomScalar generates a random scalar for BLS12-381

@@ -265,6 +265,29 @@
             <p>Privacy-preserving credential verification with selective disclosure</p>
         </div>
 
+        <!-- BBS Provider Selection -->
+        <div class="demo-section">
+            <h2 class="section-title">⚙️ BBS+ Provider Configuration</h2>
+            <div class="form-group">
+                <label>BBS+ Implementation:</label>
+                <select id="bbs-provider" onchange="updateProviderInfo()">
+                    <option value="simple">Simple Provider (Testing)</option>
+                    <option value="production" selected>Production Provider (BLS12-381)</option>
+                    <option value="aries">Aries Provider (Hyperledger Aries)</option>
+                </select>
+            </div>
+            
+            <div id="provider-info" class="response-area">
+                <div id="provider-details"></div>
+            </div>
+            
+            <div class="form-group">
+                <button class="btn" onclick="testBBSProvider()">Test BBS Provider</button>
+                <button class="btn" onclick="benchmarkProviders()">Benchmark All Providers</button>
+                <span id="provider-status" class="status-badge pending">Not Tested</span>
+            </div>
+        </div>
+
         <!-- Flow Indicator -->
         <div class="flow-indicator">
             <div class="flow-step" id="step-1">
@@ -292,6 +315,15 @@
             <!-- Issuer Section -->
             <div class="demo-section">
                 <h2 class="section-title">🏛️ Issuer (Government ID Authority)</h2>
+                
+                <div class="form-group">
+                    <label>BBS Provider for Issuer:</label>
+                    <select id="issuer-bbs-provider">
+                        <option value="simple">Simple Provider (Testing)</option>
+                        <option value="production" selected>Production Provider (BLS12-381)</option>
+                        <option value="aries">Aries Provider (Hyperledger Aries)</option>
+                    </select>
+                </div>
                 
                 <div class="form-group">
                     <button class="btn" onclick="setupIssuer()">Setup Issuer</button>
@@ -349,6 +381,15 @@
                 <h2 class="section-title">👤 Holder (Citizen)</h2>
                 
                 <div class="form-group">
+                    <label>BBS Provider for Holder:</label>
+                    <select id="holder-bbs-provider">
+                        <option value="simple">Simple Provider (Testing)</option>
+                        <option value="production" selected>Production Provider (BLS12-381)</option>
+                        <option value="aries">Aries Provider (Hyperledger Aries)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
                     <button class="btn" onclick="setupHolder()">Setup Holder</button>
                     <span id="holder-status" class="status-badge pending">Not Setup</span>
                 </div>
@@ -388,6 +429,15 @@
             <!-- Verifier Section -->
             <div class="demo-section">
                 <h2 class="section-title">🎬 Verifier (Cinema)</h2>
+                
+                <div class="form-group">
+                    <label>BBS Provider for Verifier:</label>
+                    <select id="verifier-bbs-provider">
+                        <option value="simple">Simple Provider (Testing)</option>
+                        <option value="production" selected>Production Provider (BLS12-381)</option>
+                        <option value="aries">Aries Provider (Hyperledger Aries)</option>
+                    </select>
+                </div>
                 
                 <div class="form-group">
                     <button class="btn" onclick="setupVerifier()">Setup Verifier</button>

@@ -4,12 +4,20 @@
 help:
 	@echo "Available targets:"
 	@echo "  build            - Build the demo application"
+	@echo "  build-interface  - Build the interface demo application"
 	@echo "  build-server     - Build the HTTP server application"
+	@echo "  build-all        - Build all applications"
 	@echo "  test             - Run all tests"
 	@echo "  test-unit        - Run unit tests only"
 	@echo "  test-integration - Run integration tests only"
 	@echo "  run-demo         - Run the demo application"
+	@echo "  run-interface    - Run the interface demo application"
 	@echo "  run-server       - Run the HTTP server with web UI"
+	@echo "  demo             - Run demo without building"
+	@echo "  interface        - Run interface demo without building"
+	@echo "  interface-config - Run interface configuration demo"
+	@echo "  interface-switching - Run interface provider switching demo"
+	@echo "  interface-all    - Run all interface demos"
 	@echo "  clean            - Clean build artifacts"
 	@echo "  fmt              - Format Go code"
 	@echo "  vet              - Run go vet"
@@ -20,13 +28,18 @@ build:
 	@echo "Building demo application..."
 	go build -o bin/demo ./cmd/demo
 
+# Build the interface demo application
+build-interface:
+	@echo "Building interface demo application..."
+	go build -o bin/interface_demo ./cmd/interface_demo
+
 # Build the HTTP server application
 build-server:
 	@echo "Building HTTP server application..."
 	go build -o bin/server ./cmd/server
 
 # Build all applications
-build-all: build build-server
+build-all: build build-interface build-server
 
 # Run all tests
 test: fmt vet test-unit test-integration
@@ -46,6 +59,11 @@ run-demo: build
 	@echo "Running BBS+ Selective Disclosure Demo..."
 	./bin/demo
 
+# Run the interface demo application
+run-interface: build-interface
+	@echo "Running BBS+ Interface Demo..."
+	./bin/interface_demo
+
 # Run the HTTP server
 run-server: build-server
 	@echo "Starting BBS+ Selective Disclosure HTTP Server..."
@@ -64,6 +82,24 @@ server:
 demo:
 	@echo "Running BBS+ Selective Disclosure Demo..."
 	go run ./cmd/demo
+
+# Run interface demo without building (go run)
+interface:
+	@echo "Running BBS+ Interface Demo..."
+	go run ./cmd/interface_demo
+
+# Run interface demo with specific mode
+interface-config:
+	@echo "Running BBS+ Interface Configuration Demo..."
+	go run ./cmd/interface_demo config
+
+interface-switching:
+	@echo "Running BBS+ Interface Provider Switching Demo..."
+	go run ./cmd/interface_demo switching
+
+interface-all:
+	@echo "Running All BBS+ Interface Demos..."
+	go run ./cmd/interface_demo all
 
 # Clean build artifacts
 clean:

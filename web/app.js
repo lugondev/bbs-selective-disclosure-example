@@ -5,9 +5,41 @@ let verifierDID = '';
 let issuedCredential = null;
 let currentPresentation = null;
 let verificationNonce = null; // Store the verification nonce for proper flow
+let currentBBSProvider = 'production'; // Default provider
 
 // API base URL
 const API_BASE = window.location.origin;
+
+// Provider information
+const PROVIDER_INFO = {
+    simple: {
+        name: 'Simple Provider',
+        description: 'Basic implementation for testing and development',
+        security: 'Demo level (NOT secure)',
+        performance: 'Fast',
+        productionReady: false,
+        features: ['basic_signing', 'basic_verification'],
+        warning: '⚠️ WARNING: NOT cryptographically secure - for testing only'
+    },
+    production: {
+        name: 'Production Provider',
+        description: 'Full BLS12-381 cryptographic implementation',
+        security: 'High (BLS12-381 based)',
+        performance: 'Good',
+        productionReady: true,
+        features: ['bls12_381', 'selective_disclosure', 'zero_knowledge_proofs', 'constant_time_ops'],
+        warning: '✅ Production ready with full cryptographic security'
+    },
+    aries: {
+        name: 'Aries Provider',
+        description: 'Hyperledger Aries Framework Go integration',
+        security: 'High (industry standard)',
+        performance: 'Good',
+        productionReady: true,
+        features: ['industry_standard', 'aries_interop', 'w3c_vc_compliance', 'did_support'],
+        warning: '🏢 Enterprise ready when implemented (requires Aries dependency)'
+    }
+};
 
 // Utility functions
 function log(message, type = 'info') {
@@ -69,15 +101,106 @@ async function apiCall(endpoint, options = {}) {
     }
 }
 
+// BBS Provider functions
+function updateProviderInfo() {
+    const provider = document.getElementById('bbs-provider').value;
+    currentBBSProvider = provider;
+    
+    const info = PROVIDER_INFO[provider];
+    const detailsDiv = document.getElementById('provider-details');
+    
+    detailsDiv.innerHTML = `
+        <h4>${info.name}</h4>
+        <p><strong>Description:</strong> ${info.description}</p>
+        <p><strong>Security:</strong> ${info.security}</p>
+        <p><strong>Performance:</strong> ${info.performance}</p>
+        <p><strong>Production Ready:</strong> ${info.productionReady ? 'Yes' : 'No'}</p>
+        <p><strong>Features:</strong> ${info.features.join(', ')}</p>
+        <p style="color: ${info.productionReady ? '#155724' : '#856404'};">${info.warning}</p>
+    `;
+    
+    // Update all provider selects to match
+    document.getElementById('issuer-bbs-provider').value = provider;
+    document.getElementById('holder-bbs-provider').value = provider;
+    document.getElementById('verifier-bbs-provider').value = provider;
+    
+    log(`🔧 BBS Provider changed to: ${info.name}`, 'info');
+}
+
+async function testBBSProvider() {
+    try {
+        const provider = document.getElementById('bbs-provider').value;
+        log(`🧪 Testing BBS Provider: ${PROVIDER_INFO[provider].name}...`, 'info');
+        
+        const response = await apiCall('/api/bbs/test', {
+            method: 'POST',
+            body: JSON.stringify({
+                provider: provider,
+                testMessages: ['test message 1', 'test message 2', 'test message 3']
+            })
+        });
+        
+        updateStatus('provider-status', 'success', 'Test Passed');
+        showResponse('provider-info', response);
+        
+        log(`✅ BBS Provider test completed successfully`, 'success');
+        log(`📊 Operations: Key Gen (${response.keyGenTime}), Sign (${response.signTime}), Verify (${response.verifyTime})`, 'info');
+        
+        if (response.proofTime) {
+            log(`🔒 Selective Disclosure: Create Proof (${response.proofTime}), Verify Proof (${response.proofVerifyTime})`, 'info');
+        }
+        
+    } catch (error) {
+        log(`❌ BBS Provider test failed: ${error.message}`, 'error');
+        updateStatus('provider-status', 'error', 'Test Failed');
+        showResponse('provider-info', { error: error.message }, true);
+    }
+}
+
+async function benchmarkProviders() {
+    try {
+        log('🏁 Benchmarking all BBS providers...', 'info');
+        
+        const response = await apiCall('/api/bbs/benchmark', {
+            method: 'POST',
+            body: JSON.stringify({
+                providers: ['simple', 'production', 'aries'],
+                messageCount: 5
+            })
+        });
+        
+        showResponse('provider-info', response);
+        
+        // Display benchmark results
+        for (const [provider, metrics] of Object.entries(response.results)) {
+            if (metrics.error) {
+                log(`❌ ${PROVIDER_INFO[provider].name}: ${metrics.error}`, 'error');
+            } else {
+                log(`📈 ${PROVIDER_INFO[provider].name}: ${metrics.totalOperations} operations, ${(metrics.successRate * 100).toFixed(1)}% success rate`, 'success');
+            }
+        }
+        
+        log('✅ Benchmark completed', 'success');
+        
+    } catch (error) {
+        log(`❌ Benchmark failed: ${error.message}`, 'error');
+        showResponse('provider-info', { error: error.message }, true);
+    }
+}
+
 // Issuer functions
 async function setupIssuer() {
     try {
-        log('Setting up issuer (Government ID Authority)...', 'info');
+        const provider = document.getElementById('issuer-bbs-provider').value;
+        log(`Setting up issuer (Government ID Authority) with ${PROVIDER_INFO[provider].name}...`, 'info');
         updateFlowStep(1);
         
         const response = await apiCall('/api/issuer/setup', {
             method: 'POST',
-            body: JSON.stringify({ method: 'example' })
+            body: JSON.stringify({ 
+                method: 'example',
+                bbsProvider: provider
+            })
         });
         
         issuerDID = response.did;
@@ -87,7 +210,7 @@ async function setupIssuer() {
         updateStatus('issuer-status', 'success', 'Setup Complete');
         showResponse('issuer-response', response);
         
-        log(`✅ Issuer setup complete. DID: ${issuerDID}`, 'success');
+        log(`✅ Issuer setup complete with ${PROVIDER_INFO[provider].name}. DID: ${issuerDID}`, 'success');
         
     } catch (error) {
         log(`❌ Issuer setup failed: ${error.message}`, 'error');
@@ -106,7 +229,8 @@ async function issueCredential() {
             throw new Error('Please setup holder first');
         }
         
-        log('Issuing digital ID credential...', 'info');
+        const provider = document.getElementById('issuer-bbs-provider').value;
+        log(`Issuing digital ID credential with ${PROVIDER_INFO[provider].name}...`, 'info');
         updateFlowStep(2);
         
         const claims = [
@@ -123,7 +247,8 @@ async function issueCredential() {
             body: JSON.stringify({
                 issuerDid: issuerDID,
                 subjectDid: holderDID,
-                claims: claims
+                claims: claims,
+                bbsProvider: provider
             })
         });
         
@@ -131,7 +256,7 @@ async function issueCredential() {
         document.getElementById('presentation-credential-id').value = response.credentialId;
         
         showResponse('issuer-response', response);
-        log(`✅ Credential issued successfully. ID: ${response.credentialId}`, 'success');
+        log(`✅ Credential issued successfully with ${PROVIDER_INFO[provider].name}. ID: ${response.credentialId}`, 'success');
         
         // Auto-store the credential for the holder
         await storeCredentialForHolder(response.credential);
@@ -145,11 +270,15 @@ async function issueCredential() {
 // Holder functions
 async function setupHolder() {
     try {
-        log('Setting up holder (Citizen)...', 'info');
+        const provider = document.getElementById('holder-bbs-provider').value;
+        log(`Setting up holder (Citizen) with ${PROVIDER_INFO[provider].name}...`, 'info');
         
         const response = await apiCall('/api/holder/setup', {
             method: 'POST',
-            body: JSON.stringify({ method: 'example' })
+            body: JSON.stringify({ 
+                method: 'example',
+                bbsProvider: provider
+            })
         });
         
         holderDID = response.did;
@@ -159,7 +288,7 @@ async function setupHolder() {
         updateStatus('holder-status', 'success', 'Setup Complete');
         showResponse('holder-response', response);
         
-        log(`✅ Holder setup complete. DID: ${holderDID}`, 'success');
+        log(`✅ Holder setup complete with ${PROVIDER_INFO[provider].name}. DID: ${holderDID}`, 'success');
         
     } catch (error) {
         log(`❌ Holder setup failed: ${error.message}`, 'error');
@@ -214,7 +343,8 @@ async function createPresentation() {
             throw new Error('Please enter credential ID');
         }
         
-        log('Creating selective disclosure presentation...', 'info');
+        const provider = document.getElementById('holder-bbs-provider').value;
+        log(`Creating selective disclosure presentation with ${PROVIDER_INFO[provider].name}...`, 'info');
         updateFlowStep(3);
         
         // Generate verification nonce for this presentation
@@ -239,7 +369,8 @@ async function createPresentation() {
                     credentialId: credentialId,
                     revealedAttributes: revealedAttributes
                 }],
-                nonce: verificationNonce // Include the nonce in the presentation creation
+                nonce: verificationNonce, // Include the nonce in the presentation creation
+                bbsProvider: provider
             })
         });
         
@@ -247,7 +378,7 @@ async function createPresentation() {
         document.getElementById('presentation-json').value = JSON.stringify(response.presentation, null, 2);
         
         showResponse('holder-response', response);
-        log(`✅ Presentation created with revealed attributes: ${revealedAttributes.join(', ')}`, 'success');
+        log(`✅ Presentation created with ${PROVIDER_INFO[provider].name}. Revealed: ${revealedAttributes.join(', ')}`, 'success');
         log(`📄 Hidden attributes: ${['firstName', 'lastName', 'address', 'idNumber'].filter(attr => !revealedAttributes.includes(attr)).join(', ')}`, 'warning');
         
     } catch (error) {
@@ -259,11 +390,16 @@ async function createPresentation() {
 // Verifier functions
 async function setupVerifier() {
     try {
-        log('Setting up verifier (Cinema)...', 'info');
+        const provider = document.getElementById('verifier-bbs-provider').value;
+        log(`Setting up verifier (Cinema) with ${PROVIDER_INFO[provider].name}...`, 'info');
+        updateFlowStep(4);
         
         const response = await apiCall('/api/verifier/setup', {
             method: 'POST',
-            body: JSON.stringify({ method: 'example' })
+            body: JSON.stringify({ 
+                method: 'example',
+                bbsProvider: provider
+            })
         });
         
         verifierDID = response.did;
@@ -272,7 +408,7 @@ async function setupVerifier() {
         updateStatus('verifier-status', 'success', 'Setup Complete');
         showResponse('verifier-response', response);
         
-        log(`✅ Verifier setup complete. DID: ${verifierDID}`, 'success');
+        log(`✅ Verifier setup complete with ${PROVIDER_INFO[provider].name}. DID: ${verifierDID}`, 'success');
         
     } catch (error) {
         log(`❌ Verifier setup failed: ${error.message}`, 'error');
@@ -292,7 +428,8 @@ async function verifyPresentation() {
             throw new Error('Please enter presentation JSON');
         }
         
-        log('Verifying presentation (Cinema checking age & nationality)...', 'info');
+        const provider = document.getElementById('verifier-bbs-provider').value;
+        log(`Verifying presentation (Cinema checking age & nationality) with ${PROVIDER_INFO[provider].name}...`, 'info');
         updateFlowStep(4);
         
         let presentation;
@@ -315,14 +452,15 @@ async function verifyPresentation() {
                 presentation: presentation,
                 requiredClaims: requiredClaims,
                 trustedIssuers: trustedIssuers,
-                verificationNonce: nonceToUse
+                verificationNonce: nonceToUse,
+                bbsProvider: provider
             })
         });
         
         showResponse('verifier-response', response);
         
         if (response.valid) {
-            log(`✅ Presentation verification: PASSED`, 'success');
+            log(`✅ Presentation verification with ${PROVIDER_INFO[provider].name}: PASSED`, 'success');
             log(`📊 Revealed claims: ${Object.keys(response.revealedClaims).join(', ')}`, 'info');
             
             // Age verification
@@ -345,7 +483,7 @@ async function verifyPresentation() {
             log(`🔒 Privacy Protection: Cinema CANNOT see firstName, lastName, address, idNumber`, 'warning');
             
         } else {
-            log(`❌ Presentation verification: FAILED`, 'error');
+            log(`❌ Presentation verification with ${PROVIDER_INFO[provider].name}: FAILED`, 'error');
             if (response.errors && response.errors.length > 0) {
                 response.errors.forEach(error => log(`   Error: ${error}`, 'error'));
             }

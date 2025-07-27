@@ -4,7 +4,8 @@ import "github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 
 // SetupHolderRequest represents the request to setup a holder
 type SetupHolderRequest struct {
-	Method string `json:"method" validate:"required"`
+	Method      string `json:"method" validate:"required"`
+	BBSProvider string `json:"bbsProvider,omitempty"`
 }
 
 // SetupHolderResponse represents the response from setting up a holder
@@ -29,6 +30,7 @@ type CreatePresentationRequest struct {
 	CredentialIDs       []string                        `json:"credentialIds" validate:"required,min=1"`
 	SelectiveDisclosure []SelectiveDisclosureRequestDTO `json:"selectiveDisclosure" validate:"required,min=1"`
 	Nonce               string                          `json:"nonce,omitempty"`
+	BBSProvider         string                          `json:"bbsProvider,omitempty"`
 }
 
 // SelectiveDisclosureRequestDTO represents a selective disclosure request

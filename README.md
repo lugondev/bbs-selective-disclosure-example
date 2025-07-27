@@ -9,18 +9,39 @@ This project demonstrates how selective disclosure works in practice, allowing:
 - **Holder** to store credentials and create presentations that only disclose necessary information
 - **Verifier** to check authenticity without seeing the hidden information
 
+## ✨ New: BBS+ Interface System
+
+This project now includes a **flexible BBS+ interface system** that allows switching between different implementations:
+
+- **🔧 Simple Provider**: Basic implementation for testing and development
+- **🛡️ Production Provider**: Full BLS12-381 cryptographic implementation
+- **🏢 Aries Provider**: Hyperledger Aries Framework Go integration (ready for implementation)
+
+### Quick Interface Demo
+
+```bash
+# Run the interface demo
+make interface
+
+# Try all interface features
+make interface-all
+```
+
+📖 **[Complete Interface Documentation](docs/BBS_INTERFACE.md)**
+
 ## 🏗️ Architecture
 
 ```
 /bbs-selective-disclosure-example
 ├── cmd/
 │   ├── demo/                    # CLI demo application
-│   └── server/                  # HTTP server with web UI
+│   ├── server/                  # HTTP server with web UI
+│   └── interface_demo/          # BBS+ interface demonstration
 ├── interfaces/
 │   └── http/                    # HTTP handlers and DTOs
 ├── web/                         # Web UI files
 ├── pkg/
-│   ├── bbs/                     # BBS+ cryptographic operations
+│   ├── bbs/                     # BBS+ cryptographic operations & interfaces
 │   ├── did/                     # DID management
 │   └── vc/                      # Verifiable Credentials & Presentations
 ├── internal/
@@ -29,7 +50,7 @@ This project demonstrates how selective disclosure works in practice, allowing:
 │   └── verifier/                # Verifier use cases
 ├── test/
 │   ├── integration/             # Integration tests
-│   └── unit/                    # Unit tests (future)
+│   └── unit/                    # Unit tests
 ├── docs/                        # Documentation
 └── Makefile                     # Build automation
 ```
@@ -53,7 +74,28 @@ go mod download
 make deps
 ```
 
-### 3. Run HTTP Server with Web UI
+### 3. Run BBS+ Interface Demo
+```bash
+# Run basic interface demo
+make interface
+
+# Run configuration demo
+make interface-config
+
+# Run provider switching demo
+make interface-switching
+
+# Run all interface demos
+make interface-all
+
+# Or using go run directly
+go run ./cmd/interface_demo
+go run ./cmd/interface_demo config
+go run ./cmd/interface_demo switching
+go run ./cmd/interface_demo all
+```
+
+### 4. Run HTTP Server with Web UI
 ```bash
 # Method 1: Using Makefile
 make run-server
@@ -74,7 +116,7 @@ The server will start on `http://localhost:8089` by default and provide:
 - 📡 **REST API**: HTTP endpoints at `http://localhost:8089/api/*`
 - 🏥 **Health Check**: Status endpoint at `http://localhost:8089/health`
 
-### 4. Run CLI Demo
+### 5. Run CLI Demo
 ```bash
 # Method 1: Using Makefile
 make run-demo
@@ -243,7 +285,41 @@ make dev-setup
 - Privacy-preserving
 - Zero-knowledge proofs
 
-## 🔒 Privacy Features
+## � BBS+ Interface Features
+
+### Multiple Provider Support
+- **🔧 Simple Provider**: Fast, basic implementation for testing
+- **🛡️ Production Provider**: Secure BLS12-381 implementation for production
+- **🏢 Aries Provider**: Hyperledger Aries Framework Go integration
+
+### Key Capabilities
+1. **Provider Switching**: Runtime switching between implementations
+2. **Performance Metrics**: Built-in operation tracking and benchmarking
+3. **Configuration Management**: Flexible configuration for different environments
+4. **Migration Support**: Easy migration between providers
+5. **Security Features**: Constant-time operations and secure memory management
+
+### Usage Examples
+```go
+// Create production service
+service, err := bbs.NewProductionBBSService()
+
+// Switch providers at runtime
+newService, err := bbs.SwitchProvider(
+    currentService, 
+    bbs.ProviderAries, 
+    config,
+)
+
+// Compare providers
+comparisons := bbs.CompareProviders()
+for provider, info := range comparisons {
+    fmt.Printf("%s: %s security, %t production ready\n", 
+        provider, info.SecurityLevel, info.ProductionReady)
+}
+```
+
+## �🔒 Privacy Features
 
 ### Selective Disclosure Benefits
 1. **Minimum Data Disclosure**: Only reveal necessary information

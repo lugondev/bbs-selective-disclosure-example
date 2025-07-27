@@ -9,6 +9,7 @@ import (
 	"github.com/lugondev/bbs-selective-disclosure-example/internal/holder"
 	"github.com/lugondev/bbs-selective-disclosure-example/internal/issuer"
 	"github.com/lugondev/bbs-selective-disclosure-example/internal/verifier"
+	"github.com/lugondev/bbs-selective-disclosure-example/pkg/bbs"
 )
 
 // Server represents the HTTP server
@@ -17,6 +18,7 @@ type Server struct {
 	holderHandler   *handlers.HolderHandler
 	verifierHandler *handlers.VerifierHandler
 	healthHandler   *handlers.HealthHandler
+	bbsHandler      *handlers.BBSHandler
 	port            string
 }
 
@@ -25,6 +27,7 @@ func NewServer(
 	issuerUC *issuer.UseCase,
 	holderUC *holder.UseCase,
 	verifierUC *verifier.UseCase,
+	bbsFactory bbs.BBSServiceFactory,
 	port string,
 ) *Server {
 	return &Server{
@@ -32,6 +35,7 @@ func NewServer(
 		holderHandler:   handlers.NewHolderHandler(holderUC),
 		verifierHandler: handlers.NewVerifierHandler(verifierUC),
 		healthHandler:   handlers.NewHealthHandler(),
+		bbsHandler:      handlers.NewBBSHandler(bbsFactory),
 		port:            port,
 	}
 }
@@ -59,6 +63,10 @@ func (s *Server) Start() error {
 	mux.HandleFunc("/api/verifier/verify", s.verifierHandler.VerifyPresentation)
 	mux.HandleFunc("/api/verifier/verification-request", s.verifierHandler.CreateVerificationRequest)
 	mux.HandleFunc("/api/verifier/presentations", s.verifierHandler.ListPresentations)
+
+	// BBS endpoints
+	mux.HandleFunc("/api/bbs/test", s.bbsHandler.TestProvider)
+	mux.HandleFunc("/api/bbs/benchmark", s.bbsHandler.BenchmarkProviders)
 
 	// Serve static files (for the web UI)
 	webDir := "./web/"

@@ -4,7 +4,8 @@ import "github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 
 // SetupIssuerRequest represents the request to setup an issuer
 type SetupIssuerRequest struct {
-	Method string `json:"method" validate:"required"`
+	Method      string `json:"method" validate:"required"`
+	BBSProvider string `json:"bbsProvider,omitempty"`
 }
 
 // SetupIssuerResponse represents the response from setting up an issuer
@@ -15,9 +16,10 @@ type SetupIssuerResponse struct {
 
 // IssueCredentialRequest represents the request to issue a credential
 type IssueCredentialRequest struct {
-	IssuerDID  string     `json:"issuerDid" validate:"required"`
-	SubjectDID string     `json:"subjectDid" validate:"required"`
-	Claims     []ClaimDTO `json:"claims" validate:"required,min=1"`
+	IssuerDID   string     `json:"issuerDid" validate:"required"`
+	SubjectDID  string     `json:"subjectDid" validate:"required"`
+	Claims      []ClaimDTO `json:"claims" validate:"required,min=1"`
+	BBSProvider string     `json:"bbsProvider,omitempty"`
 }
 
 // ClaimDTO represents a claim in the credential

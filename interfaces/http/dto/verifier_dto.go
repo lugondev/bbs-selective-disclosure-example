@@ -4,7 +4,8 @@ import "github.com/lugondev/bbs-selective-disclosure-example/pkg/vc"
 
 // SetupVerifierRequest represents the request to setup a verifier
 type SetupVerifierRequest struct {
-	Method string `json:"method" validate:"required"`
+	Method      string `json:"method" validate:"required"`
+	BBSProvider string `json:"bbsProvider,omitempty"`
 }
 
 // SetupVerifierResponse represents the response from setting up a verifier
@@ -19,6 +20,7 @@ type VerifyPresentationRequest struct {
 	RequiredClaims    []string                   `json:"requiredClaims"`
 	TrustedIssuers    []string                   `json:"trustedIssuers"`
 	VerificationNonce string                     `json:"verificationNonce"`
+	BBSProvider       string                     `json:"bbsProvider,omitempty"`
 }
 
 // VerifyPresentationResponse represents the response from verifying a presentation

@@ -29,13 +29,16 @@ func main() {
 	presRepo := vc.NewInMemoryPresentationRepository()
 	vcService := vc.NewService(bbsService, credRepo, presRepo)
 
+	// Initialize BBS factory for multi-provider support
+	bbsFactory := bbs.NewFactory()
+
 	// Initialize use cases
 	issuerUC := issuer.NewUseCase(didService, vcService, bbsService)
 	holderUC := holder.NewUseCase(didService, vcService, credRepo)
 	verifierUC := verifier.NewUseCase(didService, vcService, presRepo)
 
 	// Create and start HTTP server
-	server := httpServer.NewServer(issuerUC, holderUC, verifierUC, *port)
+	server := httpServer.NewServer(issuerUC, holderUC, verifierUC, bbsFactory, *port)
 
 	log.Printf("✅ All services initialized successfully")
 
