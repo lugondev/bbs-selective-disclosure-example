@@ -23,6 +23,10 @@ func TestGenerateKeyPair(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEqual(t, keyPair.PrivateKey, keyPair2.PrivateKey)
 	assert.NotEqual(t, keyPair.PublicKey, keyPair2.PublicKey)
+
+	// Test ValidateKeyPair
+	err = service.ValidateKeyPair(keyPair)
+	assert.NoError(t, err)
 }
 
 func TestSignAndVerify(t *testing.T) {
@@ -122,7 +126,7 @@ func TestCreateAndVerifyProof(t *testing.T) {
 
 		_, err := service.CreateProof(signature, keyPair.PublicKey, messages, revealedIndices, nonce)
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "revealed index 10 out of range")
+		assert.Contains(t, err.Error(), "invalid revealed indices")
 	})
 
 	t.Run("Invalid Public Key for Proof Verification", func(t *testing.T) {
@@ -180,27 +184,26 @@ func TestEncodeDecodeProof(t *testing.T) {
 		encoded := EncodeProof(proof)
 		assert.NotEmpty(t, encoded)
 
-		decoded, err := DecodeProof(encoded, revealedIndices)
+		decoded, err := DecodeProof(encoded)
 		require.NoError(t, err)
 
 		assert.Equal(t, proof.A_prime, decoded.A_prime)
 		assert.Equal(t, proof.A_bar, decoded.A_bar)
 		assert.Equal(t, proof.RevealedAttributes, decoded.RevealedAttributes)
-		// Note: decoded nonce will include additional data, so we check length
-		assert.True(t, len(decoded.Nonce) >= len(proof.Nonce))
+		assert.Equal(t, proof.Nonce, decoded.Nonce)
 	})
 
 	t.Run("Invalid Base64", func(t *testing.T) {
 		invalidEncoded := "invalid-base64!!!"
-		_, err := DecodeProof(invalidEncoded, revealedIndices)
+		_, err := DecodeProof(invalidEncoded)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "failed to decode proof")
 	})
 
 	t.Run("Invalid Data Length", func(t *testing.T) {
-		// Create a short base64 string that decodes to less than 64 bytes
+		// Create a short base64 string that decodes to less than 300 bytes
 		shortData := "dGVzdA==" // "test" in base64
-		_, err := DecodeProof(shortData, revealedIndices)
+		_, err := DecodeProof(shortData)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "invalid proof data length")
 	})
