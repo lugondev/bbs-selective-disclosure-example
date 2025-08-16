@@ -3,9 +3,9 @@ module github.com/lugondev/bbs-selective-disclosure-example
 go 1.23.8
 
 require (
-	github.com/btcsuite/btcutil v1.0.2
+	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/google/uuid v1.6.0
-	github.com/kilic/bls12-381 v0.1.0
+	github.com/kilic/bls12-381 v0.1.1-0.20210503002446-7b7597926c69
 	github.com/stretchr/testify v1.10.0
 )
 

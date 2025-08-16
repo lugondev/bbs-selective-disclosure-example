@@ -48,10 +48,15 @@ func TestBBSInterface(t *testing.T) {
 			CryptoSuite:     "BLS12381G2",
 		}
 
-		service, err := NewAriesBBSService(ariesConfig)
-		// Expected to fail since Aries is not implemented
-		assert.Error(t, err)
-		assert.Nil(t, service)
+		 service, err := NewAriesBBSService(ariesConfig)
+		 require.NoError(t, err)
+
+		 assert.Equal(t, ProviderAries, service.GetProvider())
+		 assert.True(t, service.IsProductionReady())
+		 assert.NotEmpty(t, service.GetVersion())
+
+		 // Delegate is backed by production crypto; use production-basic tests
+		 testBasicOperationsProduction(t, service)
 	})
 
 	t.Run("Provider Switching", func(t *testing.T) {
